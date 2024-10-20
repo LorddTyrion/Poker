@@ -1,4 +1,5 @@
 import { Card, Symbol } from './card';
+import {Chip} from './chip';
 import { History } from './history';
 import { ICardMoveInfo, Slot } from './slot';
 import { Deck } from './deck';
@@ -20,6 +21,7 @@ export class Map extends PIXI.Container {
   private showSlot: ShowSlot;
   private moveInfo: ICardMoveInfo;
   private bg: PIXI.Graphics;
+  private chip: Chip;
   private difficulty: number = 1;
   private slotContainer: PIXI.Container;
   private static canMoveCard: boolean = true;
@@ -39,6 +41,12 @@ export class Map extends PIXI.Container {
 
     this.slotContainer = new PIXI.Container();
     this.addChild(this.slotContainer);
+
+    this.chip=new Chip(this.game.loader);
+    this.chip.position.set(500,500);
+    this.addChild(this.chip);
+
+
 
     History.Init();
     for (let i = 0; i < 10; i++) {
