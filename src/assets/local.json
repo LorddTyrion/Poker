@@ -1,0 +1,36 @@
+{
+    "hu": {
+        "start_round": "Helyezze a kártyákat a rácsba úgy, hogy a sorokban és oszlopokban minél nagyobb értékű póker-kombinációk alakuljanak ki!",
+        "grat_for_all_success_round": "Gratulálunk!\n\nSikeresen megoldotta \na feladatot!\n\n$0 pontot szerzett",
+        "grat_for_success_round": "Gratulálunk!\n\nSikeresen megoldotta \n a(z) $0. fordulót!",
+        "round": "Forduló: $0/$1",
+        "timeout": "Sajnos lejárt az idő. De ne adja fel, próbálkozzon újra!",
+        "skip": "Narráció mellőzése",
+        "flush": "Szín",
+        "poker": "Póker",
+        "straight": "Sor",
+        "full": "Full",
+        "drill": "Drill",
+        "straight_flush": "Színsor",
+        "two_pairs": "Két pár",
+        "one_pair": "Egy pár",
+        "nothing": "Semmi"
+    },
+    "en": {
+        "start_round": "Place the cards in the grid, so that in the rows and columns the poker hands worth the most points!",
+        "grat_for_all_success_round": "Congratulation!\n\nSuccessfully solved \nthe exercise!\n\n$0 points earned",
+        "grat_for_success_round": "Congratulation!\n\nIt was successfully solved \n by round $0!",
+        "round": "Round: $0/$1",
+        "timeout": "Unfortunately, time is up. But don't give up, try again!",
+        "skip": "Ignore narration",
+        "flush": "Flush",
+        "poker": "Four of\n a kind",
+        "straight": "Straight",
+        "full": "Full",
+        "drill": "Three of\n a kind",
+        "straight_flush": "Straight\nflush",
+        "two_pairs": "Two pairs",
+        "one_pair": "One pair",
+        "nothing": "Nothing"
+    }
+}

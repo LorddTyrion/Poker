@@ -1,0 +1,53 @@
+[
+	{
+		"playTime": {
+		"good": 300,
+		"acceptable": 600,
+		"weight": 0.2
+		},
+		"mistakes": {
+		"good": 1,
+		"acceptable": 4,
+		"weight": 0.4
+		},
+    "britishScore": {
+      "good": 20,
+      "acceptable": 50,
+      "weight": 0.4
+      }
+	},
+	{
+		"playTime": {
+			"good": 360,
+			"acceptable": 900,
+			"weight": 0.2
+		},
+		"mistakes": {
+			"good": 1,
+			"acceptable": 4,
+			"weight": 0.4
+		},
+    "britishScore": {
+      "good": 30,
+      "acceptable": 60,
+      "weight": 0.4
+      }
+	},
+	{
+		"playTime": {
+			"good": 420,
+			"acceptable": 1200,
+			"weight": 0.2
+		},
+		"mistakes": {
+			"good": 1,
+			"acceptable": 4,
+			"weight": 0.4
+		},
+    "britishScore": {
+      "good": 40,
+      "acceptable": 70,
+      "weight": 0.4
+      }
+	}
+]
