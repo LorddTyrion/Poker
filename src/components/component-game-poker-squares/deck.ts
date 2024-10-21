@@ -1,9 +1,10 @@
 import { Card } from './card';
-import { ISlot } from './slot';
+import { ISlot, Slot } from './slot';
 import { History } from './history';
 import { ShowSlot } from './showSlot';
 import * as PIXI from 'pixi.js';
 import { logError } from '../../models/log';
+import {Map} from './map';
 
 export class Deck extends PIXI.Container implements ISlot {
   private bgParams: {
@@ -14,8 +15,11 @@ export class Deck extends PIXI.Container implements ISlot {
   };
   public cards: Card[] = [];
   private slotFront: ShowSlot;
+  public flopSlots: Slot[] = [];
+  private cardsDealt: number=0;
+  private map: Map;
 
-  constructor(slotFront: ShowSlot) {
+  constructor(map: Map, slotFront: ShowSlot) {
     super();
     this.bgParams = {
       width: 100,
@@ -31,6 +35,7 @@ export class Deck extends PIXI.Container implements ISlot {
     bg.endFill();
     bg.interactive = true;
 
+    this.map=map;
     this.slotFront = slotFront;
 
     bg.on('pointerup', this.slotClicked, this);
@@ -64,9 +69,13 @@ export class Deck extends PIXI.Container implements ISlot {
   }
 
   public cardClicked(card: Card) {
-    if (this.slotFront.cards.length != 0) return;
+    if (this.cardsDealt>=5){
+      this.map.calculateWinner();
+      return;
+    }
     this.cards.splice(this.cards.length - 1, 1);
-    this.slotFront.addCard([card]);
+    this.flopSlots[this.cardsDealt].addCard([card]);
+    this.cardsDealt++;
   }
 
   public slotClicked(): void {

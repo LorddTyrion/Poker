@@ -29,7 +29,6 @@ export class PokerRow {
     }
 
     const score = this.calculateScore(this.cards);
-    this.map.displayScore(this, score);
     return score;
   }
 

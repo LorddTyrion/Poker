@@ -7,14 +7,13 @@ import { ShowSlot } from './showSlot';
 import { PokerRow } from './poker-row';
 import * as PIXI from 'pixi.js';
 import { IGame } from './poker-squares-init';
-import { translate } from '../../utils/translations.utils';
-import styleSheet from '../../assets/font.json';
 import { logError } from '../../models/log';
+import { GameManager } from '../../models/game-manager';
 
 export class Map extends PIXI.Container {
   private columns: Slot[] = [];
+  private communitySlots: Slot[]=[];
   private rows: PokerRow[] = [];
-  private texts: PIXI.Text[] = [];
   private mistakes: number = 0;
   private britishScore: number = 0;
   private deckSlot: Deck;
@@ -22,9 +21,8 @@ export class Map extends PIXI.Container {
   private moveInfo: ICardMoveInfo;
   private bg: PIXI.Graphics;
   private chip: Chip;
-  private difficulty: number = 1;
-  private slotContainer: PIXI.Container;
   private static canMoveCard: boolean = true;
+  public gameManager: GameManager;
 
   constructor(settings: MapSettings, headerHeight: number, private game: IGame, private onEnded: () => void) {
     super();
@@ -36,11 +34,8 @@ export class Map extends PIXI.Container {
     this.bg.interactive = true;
     this.addChild(this.bg);
     this.sortableChildren = true;
+    this.gameManager=new GameManager();
 
-    this.difficulty = settings.difficulty;
-
-    this.slotContainer = new PIXI.Container();
-    this.addChild(this.slotContainer);
 
     this.chip=new Chip(this.game.loader);
     this.chip.position.set(500,500);
@@ -55,7 +50,7 @@ export class Map extends PIXI.Container {
     }
 
     const offset = 300;
-    for (let i = 0; i < 5; i++) {
+    /*for (let i = 0; i < 5; i++) {
       for (let j = 0; j < 5; j++) {
         const newSlot = new Slot(this, this.rows[i], this.rows[5 + j], i * 5 + j);
         const padding = newSlot.getBounds().width * 0.1;
@@ -63,28 +58,57 @@ export class Map extends PIXI.Container {
         this.slotContainer.addChild(newSlot);
         this.columns.push(newSlot);
       }
-    }
+    }*/
+    const slot1 = new Slot(this, this.rows[0], this.rows[0], 1);
+    const slot2 = new Slot(this, this.rows[0], this.rows[0], 2);
+    const padding = slot1.getBounds().width * 0.1;
+    slot1.position.set((this.game.dim.w - slot1.getBounds().width) / 2, (this.game.dim.h - slot1.getBounds().height)  - 100);
+    slot2.position.set((this.game.dim.w - slot2.getBounds().width) / 2 + slot1.getBounds().width+padding, (this.game.dim.h - slot2.getBounds().height)  - 100);
+    this.addChild(slot1);
+    this.addChild(slot2);
+    
+
+    const slot3 = new Slot(this, this.rows[0], this.rows[0], 3);
+    const slot4 = new Slot(this, this.rows[0], this.rows[0], 4);
+    slot3.position.set((this.game.dim.w - slot3.getBounds().width) / 2, slot3.getBounds().height  - 100);
+    slot4.position.set((this.game.dim.w - slot4.getBounds().width) / 2 + slot3.getBounds().width+padding, slot4.getBounds().height -100)
+    this.addChild(slot3);
+    this.addChild(slot4);
+
+    this.columns.push(slot1);
+    this.columns.push(slot2);
+    this.columns.push(slot3);
+    this.columns.push(slot4);
+
+    
+
 
     this.showSlot = new ShowSlot(this);
-    this.deckSlot = new Deck(this.showSlot);
-    this.deckSlot.position.set(this.deckSlot.getBounds().width * 0.1, (this.slotContainer.getBounds().height - this.deckSlot.getBounds().height) / 2);
-    this.slotContainer.addChild(this.deckSlot);
+    this.deckSlot = new Deck(this, this.showSlot);
+    this.deckSlot.position.set(this.deckSlot.getBounds().width * 0.1 + offset, (this.game.dim.h - this.deckSlot.getBounds().height) / 2);
+    this.addChild(this.deckSlot);
     this.showSlot.position.set(
       this.deckSlot.getBounds().right + this.showSlot.getBounds().width * 0.1,
-      (this.slotContainer.getBounds().height - this.showSlot.getBounds().height) / 2,
+      (this.game.dim.h - this.showSlot.getBounds().height) / 2,
     );
-    this.slotContainer.addChild(this.showSlot);
+    this.addChild(this.showSlot);
 
-    this.slotContainer.scale.set(Math.min((this.game.dim.h * 0.9) / (this.slotContainer.getBounds().height + 154), this.game.dim.w / (this.slotContainer.getBounds().width + 154)));
-    this.slotContainer.position.set((this.game.dim.w - this.slotContainer.getBounds().width) / 2, (this.game.dim.h - this.slotContainer.getBounds().height) / 2 - 25);
+    const flopStart = (this.game.dim.w - slot1.getBounds().width) / 2 - 2*(slot1.getBounds().width+padding)
+    for (let i=0; i<5; i++){
+      let newSlot = new Slot(this, this.rows[0], this.rows[0], i+5);
+      newSlot.position.set(flopStart+i*(slot1.getBounds().width+padding), (this.game.dim.h-newSlot.getBounds().height)/2);
+      this.addChild(newSlot);
+      this.deckSlot.flopSlots.push(newSlot);
+      this.communitySlots.push(newSlot);
+    }
 
     this.game.specificLog.nextRound();
 
-    this.generateDeal(this.difficulty);
+    this.generateDeal();
   }
 
   @logError()
-  private generateDeal(difficulty: number) {
+  private generateDeal() {
     const getRandomDeck = () => {
       let deck: { value: number; symbol: Symbol }[];
       do {
@@ -112,93 +136,7 @@ export class Map extends PIXI.Container {
       return deck.splice(deck.length - depth, 1)[0];
     };
 
-    const assembleDeck = (difficulty: number) => {
-      let poker = 0;
-      let drill = 0;
-      let iters = 0;
-      let iter_size = 0;
-      if (difficulty == 0) {
-        poker = 3;
-        drill = 2;
-        iters = 6;
-        iter_size = 4;
-      } else if (difficulty == 1) {
-        poker = 0;
-        drill = 5;
-        iters = 4;
-        iter_size = 6;
-      }
-      let deck: { value: number; symbol: Symbol }[] = [];
-      for (let i = 0; i < poker; i++) {
-        let pokerVal = Math.floor(Math.random() * clubs.length);
-
-        deck.push(clubs.splice(clubs.length - pokerVal - 1, 1)[0]);
-        deck.push(hearts.splice(hearts.length - pokerVal - 1, 1)[0]);
-        deck.push(spades.splice(spades.length - pokerVal - 1, 1)[0]);
-        deck.push(diamonds.splice(diamonds.length - pokerVal - 1, 1)[0]);
-      }
-      for (let i = 0; i < drill; i++) {
-        let drillVal = Math.floor(Math.random() * clubs.length);
-
-        deck.push(clubs.splice(clubs.length - drillVal - 1, 1)[0]);
-        deck.push(hearts.splice(hearts.length - drillVal - 1, 1)[0]);
-        deck.push(spades.splice(spades.length - drillVal - 1, 1)[0]);
-      }
-      let rest = 25 - 4 * poker - 3 * drill;
-      for (let i = 0; i < rest; i++) {
-        deck.push(getCard(getRandomDeck()));
-      }
-
-      let deck_shuffled: { value: number; symbol: Symbol }[] = [];
-      let used_indices: number[] = [];
-      let selected_from_deck: number[] = [];
-      for (let i = 0; i < 25; i++) {
-        deck_shuffled.push({ value: 0, symbol: Symbol.club });
-      }
-
-      for (let i = 0; i < iters; i++) {
-        let slot1 = Math.floor(Math.random() * iter_size);
-        let slot2 = Math.floor(Math.random() * iter_size);
-        while (slot1 == slot2) {
-          slot2 = Math.floor(Math.random() * iter_size);
-        }
-
-        if (difficulty == 0) {
-          if (i == iters - 1) {
-            deck_shuffled[i * iter_size + slot1] = deck[2];
-            deck_shuffled[i * iter_size + slot2] = deck[3];
-            selected_from_deck.push(2);
-            selected_from_deck.push(3);
-          } else {
-            deck_shuffled[i * iter_size + slot1] = deck[i * 4];
-            deck_shuffled[i * iter_size + slot2] = deck[i * 4 + 1];
-            selected_from_deck.push(i * 4);
-            selected_from_deck.push(i * 4 + 1);
-          }
-        } else if (difficulty == 1) {
-          deck_shuffled[i * iter_size + slot1] = deck[i * 3];
-          deck_shuffled[i * iter_size + slot2] = deck[i * 3 + 1];
-          selected_from_deck.push(i * 3);
-          selected_from_deck.push(i * 3 + 1);
-        }
-        used_indices.push(i * iter_size + slot1);
-        used_indices.push(i * iter_size + slot2);
-      }
-      let deck_remainder: { value: number; symbol: Symbol }[] = [];
-      for (let i = 0; i < 25; i++) {
-        if (!selected_from_deck.includes(i)) {
-          deck_remainder.push(deck[i]);
-        }
-      }
-      for (let i = 0; i < 25; i++) {
-        if (!used_indices.includes(i)) {
-          let rndCard = Math.floor(Math.random() * deck_remainder.length);
-          deck_shuffled[i] = deck_remainder.splice(deck_remainder.length - rndCard - 1, 1)[0];
-        }
-      }
-
-      return deck_shuffled;
-    };
+    
 
     const clubs: { value: number; symbol: Symbol }[] = [];
     const hearts: { value: number; symbol: Symbol }[] = [];
@@ -211,13 +149,15 @@ export class Map extends PIXI.Container {
       spades.push({ value, symbol: Symbol.spade });
       diamonds.push({ value, symbol: Symbol.diamond });
     }
-    const deck1 = assembleDeck(difficulty);
-
-    for (const _ of this.columns) {
-      const temp = deck1.pop();
-      const newCard = new Card(temp.symbol, temp.value, this.game.loader);
-      newCard.zIndex = 1;
+    
+    for (let i=1; i<52; i++) {
+      let deck=getRandomDeck();
+      let card = getCard(deck);
+      let newCard=new Card(card.symbol, card.value, this.game.loader);
       this.deckSlot.addCard([newCard]);
+    }
+    for(let i=0; i<this.columns.length; i++){
+      this.columns[i].addCard([this.deckSlot.cards[0]]);
     }
   }
 
@@ -279,60 +219,16 @@ export class Map extends PIXI.Container {
     }
     this.moveInfo = null;
   };
-  private messageFromScore(score: number): string {
-    switch (score) {
-      case 30:
-        return translate('flush', this.game.custom_lang);
-      case 16:
-        return translate('poker', this.game.custom_lang);
-      case 12:
-        return translate('straight', this.game.custom_lang);
-      case 10:
-        return translate('full', this.game.custom_lang);
-      case 6:
-        return translate('drill', this.game.custom_lang);
-      case 5:
-        return translate('straight_flush', this.game.custom_lang);
-      case 3:
-        return translate('two_pairs', this.game.custom_lang);
-      case 1:
-        return translate('one_pair', this.game.custom_lang);
-      default:
-        return translate('nothing', this.game.custom_lang);
-    }
-  }
+  
 
-  @logError()
-  public displayScore(row: PokerRow, score: number) {
-    let idx = row.index;
-    const text = new PIXI.Text(this.messageFromScore(score), { fontFamily: styleSheet.fontFamily, fontSize: 70 });
-    text.scale.set((45 * text.text.split('\n').length) / text.getBounds().height);
-    this.slotContainer.addChild(text);
-    if (idx < 5) {
-      let maxBottom = 0;
-      for (const slot of row.slots) {
-        maxBottom = Math.max(maxBottom, slot.y + 140);
-      }
-      text.anchor.set(1, 0.5);
-      text.rotation = -Math.PI / 2;
-      text.position.set(row.slots[0].x + 50, maxBottom + 100 * 0.1);
-    } else {
-      idx -= 5;
-      let maxRight = 0;
-      text.anchor.set(0, 0.5);
-      for (const slot of row.slots) maxRight = Math.max(maxRight, slot.x + 100);
-      text.position.set(maxRight + 100 * 0.1, row.slots[0].y + 140 / 2);
-    }
-    this.texts.push(text);
-    this.britishScore += score;
-  }
+  
 
   public addCardToSlot(idx: number) {
     if (this.showSlot.cards.length == 0 || !Map.canMoveCard) return;
     Map.canMoveCard = false;
     const moveX = this.columns[idx].getBounds().x - this.showSlot.cards[0].getBounds().x;
     const moveY = this.columns[idx].getBounds().y - this.showSlot.cards[0].getBounds().y;
-    this.showSlot.cards[0].moveBy(new PIXI.Point(moveX / this.slotContainer.scale.x, moveY / this.slotContainer.scale.y)).then(() => {
+    this.showSlot.cards[0].moveBy(new PIXI.Point(moveX / this.scale.x, moveY / this.scale.y)).then(() => {
       this.showSlot.cards[0].position.set(0, 0);
       this.columns[idx].addCard([this.showSlot.cards[0]]);
       Map.canMoveCard = true;
@@ -385,7 +281,21 @@ export class Map extends PIXI.Container {
 
     return ended;
   }
+  public calculateWinner(){
+    let communityCards=[];
+    for(let i=0; i<this.communitySlots.length; i++){
+      communityCards.push(this.communitySlots[i].cards[0]);
+    }
+    let bestHand1= this.gameManager.chooseBestHand(this.columns[0].cards[0], this.columns[1].cards[0], communityCards);
+    let bestHand2= this.gameManager.chooseBestHand(this.columns[2].cards[0], this.columns[3].cards[0], communityCards);
+    if(bestHand1>bestHand2){
+      console.log("Player 1 wins");
+    }
+    else console.log("Player 2 wins");
+  }
 }
+
+
 
 export interface MapSettings {
   map: string[];
