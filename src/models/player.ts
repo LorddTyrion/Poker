@@ -1,5 +1,5 @@
 import { Card } from "../components/component-game-poker-squares/card";
-import { Stake } from "./Stake";
+import { Stake } from "./stake";
 
 export abstract class Player{
     private money: number;

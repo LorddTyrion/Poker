@@ -38,7 +38,7 @@ export class Deck extends PIXI.Container implements ISlot {
     this.map=map;
     this.slotFront = slotFront;
 
-    bg.on('pointerup', this.slotClicked, this);
+    //bg.on('pointerup', this.slotClicked, this);
   }
 
   @logError()
@@ -68,9 +68,20 @@ export class Deck extends PIXI.Container implements ISlot {
     return null;
   }
 
-  public cardClicked(card: Card) {
+  public async cardClicked(card: Card) {
     if (this.cardsDealt>=5){
       this.map.calculateWinner();
+      return;
+    }
+    this.burnCard();
+    await this.delay(1000);
+    if(this.cardsDealt == 0){
+      const cards = this.cards.splice(this.cards.length - 3, 3);
+      for(let i =0; i<3; i++){
+        this.flopSlots[this.cardsDealt].addCard([cards[i]]);
+        this.cardsDealt ++;
+      }
+      
       return;
     }
     this.cards.splice(this.cards.length - 1, 1);
@@ -78,18 +89,28 @@ export class Deck extends PIXI.Container implements ISlot {
     this.cardsDealt++;
   }
 
-  public slotClicked(): void {
+  public burnCard(){
+    if(this.cards.length == 0) return;
+    let card= this.cards.splice(this.cards.length-1, 1);
+    this.slotFront.addCard(card);
+  }
+
+  /*public slotClicked(): void {
     if (this.cards.length > 0) return;
     const frontCards = this.slotFront.cards.slice();
     for (const card of frontCards) {
       this.slotFront.removeCard(card);
     }
     this.addCard(frontCards);
-  }
+  }*/
 
   public cardMoved(_card: Card, _pos: { x: number; y: number }) {}
 
   public getTopCard(): Card {
     return null;
   }
+
+  private delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 }

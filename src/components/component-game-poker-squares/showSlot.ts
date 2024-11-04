@@ -34,7 +34,7 @@ export class ShowSlot extends PIXI.Container implements ISlot {
 
   @logError()
   public addCard(cards: Card[]): boolean {
-    if (this.cards.length !== 0) return false;
+    //if (this.cards.length !== 0) return false;
     const origSlot = cards[0].slot;
     for (const card of cards) {
       if (card.slot) {

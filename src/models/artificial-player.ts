@@ -1,6 +1,6 @@
 import { Oracle } from "./oracle";
 import { Player } from "./player";
-import { Stake } from "./Stake";
+import { Stake } from "./stake";
 
 export class ArtificialPlayer extends Player{
     constructor(stake: Stake){
