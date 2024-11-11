@@ -1,8 +1,88 @@
 import { Card } from "../components/component-game-poker-squares/card";
+import { ArtificialPlayer } from "./artificial-player";
+import { FixLimitStake } from "./fix-limit-stake";
 import { HandNames } from "./hand-names";
+import { HumanPlayer } from "./human-player";
 import { logError } from "./log";
+import { Player } from "./player";
+import { Stake } from "./stake";
+import {Map} from "../components/component-game-poker-squares/map";
 
 export class GameManager{
+  private map: Map;
+  private playerCount: number=2;
+  private players: Player[]=[];
+  private stake: Stake;
+  private starter: Player;
+
+  constructor(map: Map){
+    this.map=map;
+    this.stake = new FixLimitStake(this);
+    for(let i = 0; i<this.playerCount; i++){
+      if(i==0){
+        this.players.push(new HumanPlayer(this.stake));
+        continue;
+      } 
+      this.players.push(new ArtificialPlayer(this.stake));
+    }
+    this.stake.addPlayers(this.players);    
+  }
+
+  public startGame(){
+    if(this.playerCount < 3){
+    this.starter=this.players[0];
+    }
+    else this.starter=this.players[2];
+    this.stake.collectStarterBets();
+    for(let i = 0; i<2; i++) this.rotatePlayers();
+
+  }
+
+  public manageGame(){
+    this.startGame();
+    this.bettingRound(); //pre-flop
+    this.rotatePlayers();
+    //flop
+    this.map.deckSlot.dealCards();
+    this.stake.initializeRound(false);
+    this.bettingRound();
+    this.rotatePlayers();
+    //turn
+    this.map.deckSlot.dealCards();
+    this.stake.initializeRound(true);
+    this.bettingRound();
+    this.rotatePlayers();
+    //river
+    this.map.deckSlot.dealCards();
+    this.stake.initializeRound(true);
+    this.bettingRound();
+    this.calculateWinner();
+  }
+
+  private bettingRound(){
+    while(this.stake.RoundActive()){ //Betting while there are active players
+      this.players.forEach(player => {
+        if(player.GetActive()){
+          player.Step();
+        }
+        if(!this.stake.RoundActive()) return;     
+      })
+    }
+  }
+
+  private rotatePlayers(){
+    let newStarter = this.players.splice(0,1)[0];
+    this.players.push(newStarter);
+    this.starter=newStarter;
+    this.stake.addPlayers(this.players);
+  }
+
+  
+
+  public calculateWinner(){
+    let communityCards=this.map.getCommunityCards();
+    
+  }
 
     public chooseBestHand(card1: Card, card2: Card, communityCards: Card[]): HandNames{
         //console.log(communityCards);

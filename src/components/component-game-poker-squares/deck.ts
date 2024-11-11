@@ -75,6 +75,10 @@ export class Deck extends PIXI.Container implements ISlot {
     }
     this.burnCard();
     await this.delay(1000);
+    this.dealCards();
+  }
+
+  public dealCards(){
     if(this.cardsDealt == 0){
       const cards = this.cards.splice(this.cards.length - 3, 3);
       for(let i =0; i<3; i++){
@@ -84,8 +88,8 @@ export class Deck extends PIXI.Container implements ISlot {
       
       return;
     }
-    this.cards.splice(this.cards.length - 1, 1);
-    this.flopSlots[this.cardsDealt].addCard([card]);
+    let card = this.cards.splice(this.cards.length - 1, 1);
+    this.flopSlots[this.cardsDealt].addCard(card);
     this.cardsDealt++;
   }
 

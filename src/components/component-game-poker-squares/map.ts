@@ -16,7 +16,7 @@ export class Map extends PIXI.Container {
   private rows: PokerRow[] = [];
   private mistakes: number = 0;
   private britishScore: number = 0;
-  private deckSlot: Deck;
+  public deckSlot: Deck;
   private showSlot: ShowSlot;
   private moveInfo: ICardMoveInfo;
   private bg: PIXI.Graphics;
@@ -34,7 +34,7 @@ export class Map extends PIXI.Container {
     this.bg.interactive = true;
     this.addChild(this.bg);
     this.sortableChildren = true;
-    this.gameManager=new GameManager();
+    this.gameManager=new GameManager(this);
 
 
     this.chip=new Chip(this.game.loader);
@@ -292,6 +292,14 @@ export class Map extends PIXI.Container {
       console.log("Player 1 wins");
     }
     else console.log("Player 2 wins");
+  }
+
+  public getCommunityCards(): Card[]{
+    let communityCards=[];
+    for(let i=0; i<this.communitySlots.length; i++){
+      communityCards.push(this.communitySlots[i].cards[0]);
+    }
+    return communityCards;
   }
 }
 
