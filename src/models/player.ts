@@ -2,10 +2,10 @@ import { Card } from "../components/component-game-poker-squares/card";
 import { Stake } from "./stake";
 
 export abstract class Player{
-    private money: number;
+    private money: number=10;
     private betCurrentRound: number;
     private activePlayer: boolean=true;
-    private live: boolean=true;
+    private live: boolean=false;
     private cards: Card[] = [];
     protected stake: Stake;
 
@@ -42,5 +42,5 @@ export abstract class Player{
         return true;
     }
 
-    public Step(): void {}
+    public async Step(): Promise<void> {}
 }

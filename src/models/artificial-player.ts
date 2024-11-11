@@ -6,15 +6,32 @@ export class ArtificialPlayer extends Player{
     constructor(stake: Stake){
         super(stake);
     }
-    public override Step(): void{
+    public override async Step(): Promise<void>{
         let oracle = new Oracle();
+        
         let suggestion=oracle.SuggestMove();
-        /*switch (suggestion){
-            case 1: this.stake.Bet(1); break;
-            case 2: this.stake.Call(); break;
-            case 3: this.stake.Fold(); break;
-            case 4: this.stake.Raise(1); break;
+        console.log("step "+suggestion);
+        //await this.delay(1000);
+        
+        switch (suggestion){
+            case 1: {
+                let success= this.stake.Bet(1, this);
+                if(!success) success = this.stake.Raise(1, this);
+                if(!success) this.stake.Fold(this);
+                break;
+            }
+            case 2: {
+                let success=this.stake.Check(this);
+                if(!success) success = this.stake.Call(this);
+                if(!success) this.stake.Fold(this); 
+                break;
+            }
+            case 3: this.stake.Fold(this); break;
             default: break;
-        }*/
+        }
+    }
+
+    private delay(ms: number): Promise<void> {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 }

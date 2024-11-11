@@ -69,16 +69,17 @@ export class Deck extends PIXI.Container implements ISlot {
   }
 
   public async cardClicked(card: Card) {
+    await this.map.gameManager.manageGame();
+    //this.dealCards();
+  }
+
+  public async dealCards(){
     if (this.cardsDealt>=5){
       this.map.calculateWinner();
       return;
     }
     this.burnCard();
     await this.delay(1000);
-    this.dealCards();
-  }
-
-  public dealCards(){
     if(this.cardsDealt == 0){
       const cards = this.cards.splice(this.cards.length - 3, 3);
       for(let i =0; i<3; i++){

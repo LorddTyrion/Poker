@@ -4,7 +4,7 @@ export class Oracle{
         
      }
     public SuggestMove(): number{
-        let rand = Math.floor(Math.random() * 4);
+        let rand = Math.floor(Math.random() * 3)+1;
         return rand;
     }
 }

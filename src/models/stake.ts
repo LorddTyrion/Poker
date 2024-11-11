@@ -24,4 +24,7 @@ export abstract class Stake{
     public RoundActive(): boolean{
         return false;
     }
+    public GameActive():boolean{
+        return true;
+    }
 }

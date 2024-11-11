@@ -15,14 +15,16 @@ export class GameManager{
   private stake: Stake;
   private starter: Player;
 
+  private failSafe: number=0;
+
   constructor(map: Map){
     this.map=map;
     this.stake = new FixLimitStake(this);
     for(let i = 0; i<this.playerCount; i++){
-      if(i==0){
+      /*if(i==0){
         this.players.push(new HumanPlayer(this.stake));
         continue;
-      } 
+      } */
       this.players.push(new ArtificialPlayer(this.stake));
     }
     this.stake.addPlayers(this.players);    
@@ -35,38 +37,62 @@ export class GameManager{
     else this.starter=this.players[2];
     this.stake.collectStarterBets();
     for(let i = 0; i<2; i++) this.rotatePlayers();
+    console.log("Game started");
 
   }
 
-  public manageGame(){
+  public async manageGame(){
+    console.log("Game created");
+
     this.startGame();
-    this.bettingRound(); //pre-flop
+    await this.bettingRound(); //pre-flop
     this.rotatePlayers();
     //flop
-    this.map.deckSlot.dealCards();
+    await this.map.deckSlot.dealCards();
     this.stake.initializeRound(false);
-    this.bettingRound();
+    await this.bettingRound();
     this.rotatePlayers();
     //turn
-    this.map.deckSlot.dealCards();
+    await this.map.deckSlot.dealCards();
     this.stake.initializeRound(true);
-    this.bettingRound();
+    await this.bettingRound();
     this.rotatePlayers();
     //river
-    this.map.deckSlot.dealCards();
+    await this.map.deckSlot.dealCards();
     this.stake.initializeRound(true);
-    this.bettingRound();
+    await this.bettingRound();
     this.calculateWinner();
   }
 
-  private bettingRound(){
-    while(this.stake.RoundActive()){ //Betting while there are active players
-      this.players.forEach(player => {
+  private async bettingRound(){
+    this.failSafe=0;
+    console.log("Betting round entered");
+    if(!this.stake.GameActive()){
+      console.log("Not enough players");
+      return; 
+    }      
+    while(this.stake.RoundActive()){
+      this.failSafe++;
+      console.log("In while loop"); //Betting while there are active players
+      for(let i=0; i<this.players.length; i++){
+        let player = this.players[i];      
         if(player.GetActive()){
-          player.Step();
+          //console.log("In if statement");
+          await player.Step();
         }
-        if(!this.stake.RoundActive()) return;     
-      })
+        if(!this.stake.RoundActive()){
+          console.log("Betting round exited");
+          return; 
+        } 
+        if(!this.stake.GameActive()){
+          console.log("Not enough players");
+          return; 
+        }        
+      }    
+      if(this.failSafe >= 10) {
+        console.log("Failsafe activated");
+        return;
+      }
     }
   }
 
@@ -81,6 +107,7 @@ export class GameManager{
 
   public calculateWinner(){
     let communityCards=this.map.getCommunityCards();
+    console.log("Game over");
     
   }
 
