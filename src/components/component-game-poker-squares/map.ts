@@ -59,6 +59,8 @@ export class Map extends PIXI.Container {
         this.columns.push(newSlot);
       }
     }*/
+
+    //Player 1
     const slot1 = new Slot(this, this.rows[0], this.rows[0], 1);
     const slot2 = new Slot(this, this.rows[0], this.rows[0], 2);
     const padding = slot1.getBounds().width * 0.1;
@@ -67,7 +69,7 @@ export class Map extends PIXI.Container {
     this.addChild(slot1);
     this.addChild(slot2);
     
-
+    //Player 2
     const slot3 = new Slot(this, this.rows[0], this.rows[0], 3);
     const slot4 = new Slot(this, this.rows[0], this.rows[0], 4);
     slot3.position.set((this.game.dim.w - slot3.getBounds().width) / 2, slot3.getBounds().height  - 100);
@@ -105,6 +107,8 @@ export class Map extends PIXI.Container {
     this.game.specificLog.nextRound();
 
     this.generateDeal();
+    let privateCards= this.getPrivateCards();
+    this.gameManager.assignCards(privateCards);
   }
 
   @logError()
@@ -300,6 +304,15 @@ export class Map extends PIXI.Container {
       communityCards.push(this.communitySlots[i].cards[0]);
     }
     return communityCards;
+  }
+  private getPrivateCards(): Card[]{
+    let privateCards= [];
+    for(let i=0; i<this.columns.length; i++){
+      for(let j=0; j< this.columns[i].cards.length; j++){
+        privateCards.push(this.columns[i].cards[j]);
+      }
+    }
+    return privateCards;
   }
 }
 

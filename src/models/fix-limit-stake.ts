@@ -22,19 +22,25 @@ export class FixLimitStake extends Stake{
         this.checkCount=0;
         this.raises=0;
         this.opened=false;
-        this.players.forEach(pl =>{
-            pl.SetLive(false);
-        })
+        for(let i=0; i< this.players.length; i++){
+            this.players[i].SetLive(false);
+            this.players[i].SetCurrentBet(0);
+        }
+        
     }
 
     public override collectStarterBets(): void {
-        this.players[0].CollectMoney(this.smallBlind); //Small blind
+        this.players[0].CollectMoney(this.smallBlind);//Small blind
+        this.players[0].SetCurrentBet(this.smallBlind); 
         this.players[1].CollectMoney(this.bigBlind); //Big blind
+        this.players[1].SetCurrentBet(this.bigBlind)
         this.pot += (this.smallBlind + this.bigBlind);
+        this.highestBet=this.bigBlind;
         console.log("Pot: " + this.pot);
-        this.players.forEach(pl =>{
-            pl.SetLive(true);
-        })
+        for(let i=0; i< this.players.length; i++){
+            this.players[i].SetLive(true);
+            this.players[i].SetActive(true);
+        }
         this.opened=true;
     }
     public override Bet(amount: number, player: Player): boolean{
@@ -49,12 +55,14 @@ export class FixLimitStake extends Stake{
         } 
         let success= player.CollectMoney(actualAmount);
         if(!success) return false;
-            this.pot += actualAmount;       
-        this.players.forEach(pl =>{
-            pl.SetLive(true);
-        })
+        this.pot += actualAmount;       
+        for(let i=0; i< this.players.length; i++){
+            this.players[i].SetLive(true);
+        }
         player.SetLive(false);
         this.highestBet=actualAmount;
+        player.SetCurrentBet(actualAmount);
+        this.opened=true;
         console.log("Bet success")
         return true;
     }
@@ -65,6 +73,7 @@ export class FixLimitStake extends Stake{
         let success = player.CollectMoney(difference);
         if(!success) return false;
         this.pot += difference;
+        player.SetCurrentBet(this.highestBet);
         player.SetLive(false);
         console.log("Call success")
         return true;
@@ -81,11 +90,12 @@ export class FixLimitStake extends Stake{
         if(!success) return false;
         this.pot += actualAmount;
 
-        this.players.forEach(pl =>{
-            pl.SetLive(true);
-        })
+        for(let i=0; i< this.players.length; i++){
+            this.players[i].SetLive(true);
+        }
         player.SetLive(false);
         this.highestBet=actualAmount + player.GetCurrentBet();
+        player.SetCurrentBet(this.highestBet);
         this.raises++;
         console.log("Raise success")
         return true;
@@ -107,12 +117,19 @@ export class FixLimitStake extends Stake{
 
     public override RoundActive(): boolean {
         let areThereLivePlayers=false;
+        console.log(this.players)
         this.players.forEach(pl =>{
-            if(pl.GetLive() && pl.GetActive()) areThereLivePlayers=true;
+            console.log(pl);
+            if(pl.GetLive()) areThereLivePlayers=true;
         }
         )
-        if(this.opened && !areThereLivePlayers) return false;
-        if(!this.opened && this.checkCount>=this.players.length) return false;
+        if(this.opened && !areThereLivePlayers){
+            //console.log("Failed at 1", this.opened, areThereLivePlayers);
+            return false;
+        } 
+        if(!this.opened && this.checkCount>=this.players.length){
+             return false;
+        }
         return true;
     }
 

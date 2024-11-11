@@ -11,6 +11,9 @@ export abstract class Player{
 
     constructor(stake: Stake){
         this.stake=stake;
+        this.money=10;
+        this.activePlayer=true;
+        this.live=false;
     }
 
     public GetMoney(): number{
@@ -18,6 +21,9 @@ export abstract class Player{
     }
     public GetCurrentBet(): number{
         return this.betCurrentRound;
+    }
+    public SetCurrentBet(amount: number){
+        this.betCurrentRound=amount;
     }
     
     public GetActive(): boolean{
@@ -32,7 +38,9 @@ export abstract class Player{
     public SetLive(live: boolean){
         this.live=live;
     }
-
+    public AddCard(card: Card){
+        this.cards.push(card);
+    }
     public GetCards(): Card[]{
         return this.cards;
     }
