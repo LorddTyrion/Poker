@@ -22,6 +22,9 @@ export class Map extends PIXI.Container {
   private moveInfo: ICardMoveInfo;
   private bg: PIXI.Graphics;
   private chip: Chip;
+  public raiseButton: Button;
+  public callButton: Button;
+  public foldButton: Button;
   private static canMoveCard: boolean = true;
   public gameManager: GameManager;
 
@@ -41,17 +44,17 @@ export class Map extends PIXI.Container {
     /*this.chip=new Chip(this.game.loader);
     this.chip.position.set(500,500);
     this.addChild(this.chip);*/
-    const raiseButton = new Button({ label: "Bet / Raise" }, this.game.loader);
-    raiseButton.position.set((this.game.dim.w - raiseButton.getBounds().width) -100 ,(this.game.dim.h - raiseButton.getBounds().height)  - 100);
-    this.addChild(raiseButton);
+    this.raiseButton = new Button({ label: "Bet / Raise" }, this.game.loader);
+    this.raiseButton.position.set((this.game.dim.w - this.raiseButton.getBounds().width) -100 ,(this.game.dim.h - this.raiseButton.getBounds().height)  - 100);
+    this.addChild(this.raiseButton);
 
-    const callButton = new Button({ label: "Check / call" }, this.game.loader);
-    callButton.position.set((this.game.dim.w - callButton.getBounds().width) -100 ,(this.game.dim.h - 2.2*callButton.getBounds().height)  - 100);
-    this.addChild(callButton);
+    this.callButton = new Button({ label: "Check / call" }, this.game.loader);
+    this.callButton.position.set((this.game.dim.w - this.callButton.getBounds().width) -100 ,(this.game.dim.h - 2.2*this.callButton.getBounds().height)  - 100);
+    this.addChild(this.callButton);
 
-    const foldButton = new Button({ label: "Fold" }, this.game.loader);
-    foldButton.position.set((this.game.dim.w - foldButton.getBounds().width) -100 ,(this.game.dim.h - 3.3* foldButton.getBounds().height)  - 100);
-    this.addChild(foldButton);
+    this.foldButton = new Button({ label: "Fold" }, this.game.loader);
+    this.foldButton.position.set((this.game.dim.w - this.foldButton.getBounds().width) -100 ,(this.game.dim.h - 3.3* this.foldButton.getBounds().height)  - 100);
+    this.addChild(this.foldButton);
     //raiseButton.addClickListener(( _=> console.log("Új cucc")));
    
     

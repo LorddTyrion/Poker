@@ -22,10 +22,12 @@ export class GameManager{
     this.map=map;
     this.stake = new FixLimitStake(this);
     for(let i = 0; i<this.playerCount; i++){
-      /*if(i==0){
-        this.players.push(new HumanPlayer(this.stake));
+      if(i==0){
+        let hplayer =new HumanPlayer(this.stake, map);
+        this.playersActual.push(hplayer);
+        this.playersOriginal.push(hplayer);
         continue;
-      } */
+      } 
       let player =new ArtificialPlayer(this.stake);
       this.playersActual.push(player);
       this.playersOriginal.push(player);
@@ -119,6 +121,16 @@ export class GameManager{
   public calculateWinner(){
     let communityCards=this.map.getCommunityCards();
     console.log("Game over");
+    let activePlayers = [];
+    for(let i=0; i<this.playersOriginal.length; i++){
+      if(this.playersOriginal[i].GetActive()) activePlayers.push(i);
+    }
+    if(activePlayers.length == 1){
+      console.log(`Player ${activePlayers[0]} is the winner`);
+      return;
+    }
+
+
     let bestHands: HandValue[]=[];
     for(let i=0; i<this.playersOriginal.length; i++){
       bestHands.push(this.chooseBestHand(this.playersOriginal[i].GetCards()[0], this.playersOriginal[i].GetCards()[1], communityCards));      

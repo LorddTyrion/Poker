@@ -12,8 +12,18 @@ export class ArtificialPlayer extends Player{
         let suggestion=oracle.SuggestMove();
         console.log("step "+suggestion);
         //await this.delay(1000);
-        
-        switch (suggestion){
+        if(suggestion <30 ){
+            let success= this.stake.Bet(1, this);
+            if(!success) success = this.stake.Raise(1, this);
+            if(!success) this.stake.Fold(this);
+        }
+        else if(suggestion < 90){
+            let success=this.stake.Check(this);
+            if(!success) success = this.stake.Call(this);
+            if(!success) this.stake.Fold(this); 
+        }
+        else this.stake.Fold(this);
+        /*switch (suggestion){
             case 1: {
                 let success= this.stake.Bet(1, this);
                 if(!success) success = this.stake.Raise(1, this);
@@ -28,7 +38,7 @@ export class ArtificialPlayer extends Player{
             }
             case 3: this.stake.Fold(this); break;
             default: break;
-        }
+        }*/
     }
 
     private delay(ms: number): Promise<void> {
