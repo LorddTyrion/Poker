@@ -26,6 +26,7 @@ export const res = {
   error: './assets/poker-squares-res/img/release/error.svg',
   chip: './assets/poker-squares-res/img/release/chip.svg',
   dealerBadge: './assets/poker-squares-res/img/release/dealer-badge.svg',
+  button: './assets/poker-squares-res/img/release/button.png',
 };
 
 export function init(callback: () => void) {

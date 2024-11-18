@@ -9,6 +9,7 @@ import * as PIXI from 'pixi.js';
 import { IGame } from './poker-squares-init';
 import { logError } from '../../models/log';
 import { GameManager } from '../../models/game-manager';
+import {Button} from './button';
 
 export class Map extends PIXI.Container {
   private columns: Slot[] = [];
@@ -37,10 +38,23 @@ export class Map extends PIXI.Container {
     this.gameManager=new GameManager(this);
 
 
-    this.chip=new Chip(this.game.loader);
+    /*this.chip=new Chip(this.game.loader);
     this.chip.position.set(500,500);
-    this.addChild(this.chip);
+    this.addChild(this.chip);*/
+    const raiseButton = new Button({ label: "Bet / Raise" }, this.game.loader);
+    raiseButton.position.set((this.game.dim.w - raiseButton.getBounds().width) -100 ,(this.game.dim.h - raiseButton.getBounds().height)  - 100);
+    this.addChild(raiseButton);
 
+    const callButton = new Button({ label: "Check / call" }, this.game.loader);
+    callButton.position.set((this.game.dim.w - callButton.getBounds().width) -100 ,(this.game.dim.h - 2.2*callButton.getBounds().height)  - 100);
+    this.addChild(callButton);
+
+    const foldButton = new Button({ label: "Fold" }, this.game.loader);
+    foldButton.position.set((this.game.dim.w - foldButton.getBounds().width) -100 ,(this.game.dim.h - 3.3* foldButton.getBounds().height)  - 100);
+    this.addChild(foldButton);
+    //raiseButton.addClickListener(( _=> console.log("Új cucc")));
+   
+    
 
 
     History.Init();
