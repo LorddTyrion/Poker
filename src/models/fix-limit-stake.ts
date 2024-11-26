@@ -37,6 +37,7 @@ export class FixLimitStake extends Stake{
         this.pot += (this.smallBlind + this.bigBlind);
         this.highestBet=this.bigBlind;
         console.log("Pot: " + this.pot);
+        this.gameManager.updateMoney([this.players[0].GetMoney(), this.players[1].GetMoney()], this.pot);
         for(let i=0; i< this.players.length; i++){
             this.players[i].SetLive(true);
             this.players[i].SetActive(true);
@@ -55,7 +56,7 @@ export class FixLimitStake extends Stake{
         } 
         let success= player.CollectMoney(actualAmount);
         if(!success) return false;
-        this.pot += actualAmount;       
+        this.pot += actualAmount;     
         for(let i=0; i< this.players.length; i++){
             this.players[i].SetLive(true);
         }
@@ -63,6 +64,7 @@ export class FixLimitStake extends Stake{
         this.highestBet=actualAmount;
         player.SetCurrentBet(actualAmount);
         this.opened=true;
+        this.gameManager.updateMoney([this.players[0].GetMoney(), this.players[1].GetMoney()], this.pot);  
         console.log("Bet success")
         return true;
     }
@@ -75,6 +77,7 @@ export class FixLimitStake extends Stake{
         this.pot += difference;
         player.SetCurrentBet(this.highestBet);
         player.SetLive(false);
+        this.gameManager.updateMoney([this.players[0].GetMoney(), this.players[1].GetMoney()], this.pot);  
         console.log("Call success")
         return true;
     }
@@ -97,6 +100,7 @@ export class FixLimitStake extends Stake{
         this.highestBet=actualAmount + player.GetCurrentBet();
         player.SetCurrentBet(this.highestBet);
         this.raises++;
+        this.gameManager.updateMoney([this.players[0].GetMoney(), this.players[1].GetMoney()], this.pot);  
         console.log("Raise success")
         return true;
     }

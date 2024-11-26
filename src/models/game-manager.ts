@@ -35,6 +35,14 @@ export class GameManager{
     this.stake.addPlayers(this.playersOriginal);    
   }
 
+  public updateMoney(chips: number[], pot: number){
+    let chipTexts: string[]=[];
+    for(let i = 0; i< chips.length; i++){
+      chipTexts.push(chips[i].toString());
+    }
+    this.map.updateTexts(chipTexts, pot.toString());
+  }
+
   public assignCards(cards: Card[]){
     for(let i = 0; i<cards.length; i++){
       this.playersOriginal[Math.floor(i/2)].AddCard(cards[i]);

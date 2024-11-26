@@ -21,7 +21,10 @@ export class Map extends PIXI.Container {
   private showSlot: ShowSlot;
   private moveInfo: ICardMoveInfo;
   private bg: PIXI.Graphics;
-  private chip: Chip;
+  private chips: Chip[]=[];
+  private chipText1: PIXI.Text;
+  private chipText2: PIXI.Text;
+  private potText: PIXI.Text;
   public raiseButton: Button;
   public callButton: Button;
   public foldButton: Button;
@@ -41,9 +44,7 @@ export class Map extends PIXI.Container {
     this.gameManager=new GameManager(this);
 
 
-    /*this.chip=new Chip(this.game.loader);
-    this.chip.position.set(500,500);
-    this.addChild(this.chip);*/
+    
     this.raiseButton = new Button({ label: "Bet / Raise" }, this.game.loader);
     this.raiseButton.position.set((this.game.dim.w - this.raiseButton.getBounds().width) -100 ,(this.game.dim.h - this.raiseButton.getBounds().height)  - 100);
     this.addChild(this.raiseButton);
@@ -55,7 +56,7 @@ export class Map extends PIXI.Container {
     this.foldButton = new Button({ label: "Fold" }, this.game.loader);
     this.foldButton.position.set((this.game.dim.w - this.foldButton.getBounds().width) -100 ,(this.game.dim.h - 3.3* this.foldButton.getBounds().height)  - 100);
     this.addChild(this.foldButton);
-    //raiseButton.addClickListener(( _=> console.log("Új cucc")));
+    
    
     
 
@@ -120,6 +121,29 @@ export class Map extends PIXI.Container {
       this.deckSlot.flopSlots.push(newSlot);
       this.communitySlots.push(newSlot);
     }
+
+    const chipstart = this.deckSlot.getBounds().width * 0.1 + offset;
+    const chip1= new Chip(this.game.loader);
+    chip1.position.set(chipstart, (this.game.dim.h - slot1.getBounds().height)  - 100);
+    this.chips.push(chip1);
+    this.addChild(chip1);
+
+    this.chipText1 = new PIXI.Text("Chip 1");
+    this.chipText1.position.set(chipstart + chip1.getBounds().width + 20, (this.game.dim.h - slot1.getBounds().height)  - 100);
+    this.addChild(this.chipText1);
+
+    const chip2= new Chip(this.game.loader);
+    chip2.position.set(chipstart, slot3.getBounds().height  - 100);
+    this.chips.push(chip2);
+    this.addChild(chip2);
+
+    this.chipText2 = new PIXI.Text("Chip 2");
+    this.chipText2.position.set(chipstart + chip2.getBounds().width +20, slot3.getBounds().height  - 100);
+    this.addChild(this.chipText2);
+
+    this.potText = new PIXI.Text("Pot: ");
+    this.potText.position.set((this.game.dim.w - this.foldButton.getBounds().width -200),(this.game.dim.h - 4.4* this.foldButton.getBounds().height)  - 100);
+    this.addChild(this.potText);
 
     this.game.specificLog.nextRound();
 
@@ -255,6 +279,12 @@ export class Map extends PIXI.Container {
       Map.canMoveCard = true;
       this.checkFinish();
     });
+  }
+
+  public updateTexts(chipTexts: string[], potText: string){
+    this.chipText1.text = chipTexts[0];
+    this.chipText2.text = chipTexts[1];
+    this.potText.text = "Pot: "+potText;
   }
 
   @logError()
