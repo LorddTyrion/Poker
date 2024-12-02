@@ -6,8 +6,8 @@ type PlayerAction = 'fold' | 'call' | 'raise';
 export class HumanPlayer extends Player{
     private timeoutSeconds: number;
     private map: Map;
-    constructor(stake: Stake, map: Map, timeoutSeconds: number = 30){
-        super(stake);
+    constructor(stake: Stake, index: number, map: Map, timeoutSeconds: number = 120){
+        super(stake, index);
         this.timeoutSeconds = timeoutSeconds;
         this.map = map;
     }

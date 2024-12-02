@@ -73,9 +73,9 @@ export class Deck extends PIXI.Container implements ISlot {
     //this.dealCards();
   }
 
-  public async dealCards(){
+  public async dealCards():Promise<void>{
     if (this.cardsDealt>=5){
-      this.map.calculateWinner();
+      //this.map.calculateWinner();
       return;
     }
     this.burnCard();

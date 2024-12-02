@@ -9,7 +9,7 @@ import { Random } from './random';
 
 export class Controller {
   private restartable: boolean = false;
-  public readonly maxRounds: number = 3;
+  public readonly maxRounds: number = 1;
   private map: Map;
   public gamePanel: GamePanel;
   private infoMgr: InfoManager;
@@ -93,7 +93,8 @@ export class Controller {
     this.restartable = false;
     this.game.specificLog.setPlayTime(this.gamePanel.recentTime - this.lastTs);
     if (this.gamePanel.isLastRound()) {
-      this.infoMgr.showMsg(parseParamTranslate('grat_for_all_success_round', this.game.custom_lang, this.game.calculateScore())).then(() => {
+      let result= this.map.humanPlayerWon()? parseParamTranslate('win', this.game.custom_lang) : parseParamTranslate('lose', this.game.custom_lang);
+      this.infoMgr.showMsg(parseParamTranslate('grat_for_all_success_round', this.game.custom_lang, result), false).then(() => {
         this.game.sendMessage();
         this.gamePanel.pauseTimer();
         this.game.app.stage.removeChildren();

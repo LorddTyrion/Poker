@@ -92,7 +92,9 @@ export class InfoManager extends PIXI.Container {
   }
 
   public async showMsg(msg: string, disabledText: boolean = true): Promise<void> {
+    console.log("Show message");
     if (!this.game.doNarration && disabledText) {
+      console.log("Something's wrong, I can feel it");
       return Promise.resolve();
     }
     this.container.interactiveChildren = false;

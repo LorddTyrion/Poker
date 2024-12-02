@@ -7,13 +7,18 @@ export abstract class Player{
     private activePlayer: boolean=true;
     private live: boolean=false;
     private cards: Card[] = [];
+    private index: number=-1;
     protected stake: Stake;
 
-    constructor(stake: Stake){
+    constructor(stake: Stake, index: number){
         this.stake=stake;
+        this.index=index;
         this.money=20;
         this.activePlayer=true;
         this.live=false;
+    }
+    public GetIndex(): number{
+        return this.index;
     }
 
     public GetMoney(): number{

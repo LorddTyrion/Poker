@@ -3,15 +3,15 @@ import { Player } from "./player";
 import { Stake } from "./stake";
 
 export class ArtificialPlayer extends Player{
-    constructor(stake: Stake){
-        super(stake);
+    constructor(stake: Stake, index: number){
+        super(stake, index);
     }
     public override async Step(): Promise<void>{
         let oracle = new Oracle();
         
         let suggestion=oracle.SuggestMove();
         console.log("step "+suggestion);
-        //await this.delay(1000);
+        await this.delay(5000);
         if(suggestion <30 ){
             let success= this.stake.Bet(1, this);
             if(!success) success = this.stake.Raise(1, this);
@@ -42,6 +42,7 @@ export class ArtificialPlayer extends Player{
     }
 
     private delay(ms: number): Promise<void> {
+        console.log("delay");
         return new Promise(resolve => setTimeout(resolve, ms));
     }
 }
