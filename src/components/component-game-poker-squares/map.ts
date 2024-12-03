@@ -341,6 +341,7 @@ export class Map extends PIXI.Container {
   public getCommunityCards(): Card[]{
     let communityCards=[];
     for(let i=0; i<this.communitySlots.length; i++){
+      if(this.communitySlots[i].cards[0] == null) continue;
       communityCards.push(this.communitySlots[i].cards[0]);
     }
     return communityCards;

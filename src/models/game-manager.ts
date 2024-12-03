@@ -28,7 +28,7 @@ export class GameManager{
         this.playersOriginal.push(hplayer);
         continue;
       } 
-      let player =new ArtificialPlayer(this.stake, i);
+      let player =new ArtificialPlayer(this.stake, i, this.map);
       this.playersActual.push(player);
       this.playersOriginal.push(player);
     }
@@ -201,7 +201,7 @@ export class GameManager{
         return bestHand;
     }
 
-    private tiebreak(tryHandValue: HandValue, bestHand: HandValue): HandValue{
+    public tiebreak(tryHandValue: HandValue, bestHand: HandValue): HandValue{
       console.log("Tried hand ", tryHandValue);
       console.log("Best hand ", bestHand);
       if(!tryHandValue) return bestHand;
@@ -219,7 +219,7 @@ export class GameManager{
 
     @logError()
     public calculateHand(cards: Card[]): HandValue {
-      //console.log(cards.length);
+      console.log(cards);
       let straight =this.checkStraight(cards);
       let flush=this.checkColor(cards);
       if (straight[0] && flush[0]){
