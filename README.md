@@ -16,7 +16,7 @@ Stencil components are just Web Components, so they work in any major framework 
 
 ## Getting Started
 
-To start building a new web component using Stencil, clone this repo to a new directory:
+To start the game, clone this repo to a new directory:
 
 ```bash
 git clone https://github.com/LorddTyrion/Poker.git
