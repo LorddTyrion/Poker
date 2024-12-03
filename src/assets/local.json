@@ -1,6 +1,6 @@
 {
     "hu": {
-        "start_round": "Ez egy kötött tétekkel játszott texas hold'em pókermeccs egy mesterséges játékos ellen. Kattints a paklira a kezdéshez!",
+        "start_round": "Ez egy kötött tétekkel játszott Texas Hold'em pókermeccs egy mesterséges játékos ellen. Kattints a paklira a kezdéshez!",
         "grat_for_all_success_round": "Játék vége!\n\nÖn $0!",
         "grat_for_success_round": "Gratulálunk!\n\nSikeresen megoldotta \n a(z) $0. fordulót!",
         "round": "Forduló: $0/$1",

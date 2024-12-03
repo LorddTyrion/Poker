@@ -61,7 +61,7 @@ export class ShowSlot extends PIXI.Container implements ISlot {
   }
 
   public cardClicked(_: Card) {
-    this.map.checkFinish();
+    //this.map.checkFinish();
   }
 
   public cardMoved(card: Card, pos: { x: number; y: number }) {

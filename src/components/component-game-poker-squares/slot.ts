@@ -55,9 +55,6 @@ export class Slot extends PIXI.Container implements ISlot {
 
     this.col.addCard(cards[0]);
     this.row.addCard(cards[0]);
-    let score1 = this.col.isFull();
-    let score2 = this.row.isFull();
-    this.map.checkForMistakes(cards[0], Math.floor(this.idx / 5), this.idx % 5, Math.max(score1, score2));
     return true;
   }
 
