@@ -1,7 +1,7 @@
 {
     "hu": {
-        "start_round": "Helyezze a kártyákat a rácsba úgy, hogy a sorokban és oszlopokban minél nagyobb értékű póker-kombinációk alakuljanak ki!",
-        "grat_for_all_success_round": "Gratulálunk!\n\nSikeresen megoldotta \na feladatot!\n\n$0 pontot szerzett",
+        "start_round": "Ez egy kötött tétekkel játszott texas hold'em pókermeccs egy mesterséges játékos ellen. Kattints a paklira a kezdéshez!",
+        "grat_for_all_success_round": "Játék vége!\n\nÖn $0!",
         "grat_for_success_round": "Gratulálunk!\n\nSikeresen megoldotta \n a(z) $0. fordulót!",
         "round": "Forduló: $0/$1",
         "timeout": "Sajnos lejárt az idő. De ne adja fel, próbálkozzon újra!",
@@ -14,11 +14,13 @@
         "straight_flush": "Színsor",
         "two_pairs": "Két pár",
         "one_pair": "Egy pár",
-        "nothing": "Semmi"
+        "nothing": "Semmi",
+        "win": "nyert",
+        "lose": "vesztett"
     },
     "en": {
-        "start_round": "Place the cards in the grid, so that in the rows and columns the poker hands worth the most points!",
-        "grat_for_all_success_round": "Congratulation!\n\nSuccessfully solved \nthe exercise!\n\n$0 points earned",
+        "start_round": "This is a fix limit texas hold'em poker game against an atrificial opponent. Click the deck of cards to start!",
+        "grat_for_all_success_round": "Game over!\n\nYou $0!",
         "grat_for_success_round": "Congratulation!\n\nIt was successfully solved \n by round $0!",
         "round": "Round: $0/$1",
         "timeout": "Unfortunately, time is up. But don't give up, try again!",
@@ -31,6 +33,8 @@
         "straight_flush": "Straight\nflush",
         "two_pairs": "Two pairs",
         "one_pair": "One pair",
-        "nothing": "Nothing"
+        "nothing": "Nothing",
+        "win": "won",
+        "lose": "lost"
     }
 }

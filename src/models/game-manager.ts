@@ -23,16 +23,28 @@ export class GameManager{
     this.stake = new FixLimitStake(this);
     for(let i = 0; i<this.playerCount; i++){
       if(i==0){
-        let hplayer =new HumanPlayer(this.stake, map);
+        let hplayer =new HumanPlayer(this.stake, 0, map);
         this.playersActual.push(hplayer);
         this.playersOriginal.push(hplayer);
         continue;
       } 
-      let player =new ArtificialPlayer(this.stake);
+      let player =new ArtificialPlayer(this.stake, i);
       this.playersActual.push(player);
       this.playersOriginal.push(player);
     }
     this.stake.addPlayers(this.playersOriginal);    
+  }
+
+  public updateMoney(chips: number[], pot: number){
+    let chipTexts: string[]=[];
+    for(let i = 0; i< chips.length; i++){
+      chipTexts.push(chips[i].toString());
+    }
+    this.map.updateTexts(chipTexts, pot.toString());
+  }
+
+  public updateAction(index: number, action: string){
+    this.map.updateActionTexts(index, action);
   }
 
   public assignCards(cards: Card[]){
@@ -88,6 +100,7 @@ export class GameManager{
       for(let i=0; i<this.playersActual.length; i++){
         let player = this.playersActual[i];      
         if(player.GetActive()){
+          this.map.updateTurn(player.GetIndex());
           //console.log("In if statement");
           await player.Step();
         }
@@ -127,6 +140,7 @@ export class GameManager{
     }
     if(activePlayers.length == 1){
       console.log(`Player ${activePlayers[0]} is the winner`);
+      this.map.endGame(activePlayers[0]);
       return;
     }
 
@@ -142,6 +156,7 @@ export class GameManager{
     let winnerIndex=bestHands.indexOf(bestHand);
     console.log(`Player ${winnerIndex} is the winner`);
     console.log("Best hand ", bestHand);
+    this.map.endGame(winnerIndex);
     
   }
 

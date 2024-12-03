@@ -2,18 +2,23 @@ import { Card } from "../components/component-game-poker-squares/card";
 import { Stake } from "./stake";
 
 export abstract class Player{
-    private money: number=10;
+    private money: number=20;
     private betCurrentRound: number;
     private activePlayer: boolean=true;
     private live: boolean=false;
     private cards: Card[] = [];
+    private index: number=-1;
     protected stake: Stake;
 
-    constructor(stake: Stake){
+    constructor(stake: Stake, index: number){
         this.stake=stake;
-        this.money=10;
+        this.index=index;
+        this.money=20;
         this.activePlayer=true;
         this.live=false;
+    }
+    public GetIndex(): number{
+        return this.index;
     }
 
     public GetMoney(): number{

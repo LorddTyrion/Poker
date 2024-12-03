@@ -37,9 +37,15 @@ export class FixLimitStake extends Stake{
         this.pot += (this.smallBlind + this.bigBlind);
         this.highestBet=this.bigBlind;
         console.log("Pot: " + this.pot);
+        this.gameManager.updateMoney([this.playersInOrder()[0].GetMoney(), this.playersInOrder()[1].GetMoney()], this.pot);
         for(let i=0; i< this.players.length; i++){
             this.players[i].SetLive(true);
             this.players[i].SetActive(true);
+            if(i==1) {
+                this.players[i].SetLive(false);
+                continue;
+            }
+            this.players[i].SetLive(true);
         }
         this.opened=true;
     }
@@ -55,7 +61,7 @@ export class FixLimitStake extends Stake{
         } 
         let success= player.CollectMoney(actualAmount);
         if(!success) return false;
-        this.pot += actualAmount;       
+        this.pot += actualAmount;     
         for(let i=0; i< this.players.length; i++){
             this.players[i].SetLive(true);
         }
@@ -63,6 +69,8 @@ export class FixLimitStake extends Stake{
         this.highestBet=actualAmount;
         player.SetCurrentBet(actualAmount);
         this.opened=true;
+        this.gameManager.updateMoney([this.playersInOrder()[0].GetMoney(), this.playersInOrder()[1].GetMoney()], this.pot); 
+        this.gameManager.updateAction(player.GetIndex(), "BET");
         console.log("Bet success")
         return true;
     }
@@ -75,6 +83,8 @@ export class FixLimitStake extends Stake{
         this.pot += difference;
         player.SetCurrentBet(this.highestBet);
         player.SetLive(false);
+        this.gameManager.updateMoney([this.playersInOrder()[0].GetMoney(), this.playersInOrder()[1].GetMoney()], this.pot);
+        this.gameManager.updateAction(player.GetIndex(), "CALL");  
         console.log("Call success")
         return true;
     }
@@ -97,12 +107,15 @@ export class FixLimitStake extends Stake{
         this.highestBet=actualAmount + player.GetCurrentBet();
         player.SetCurrentBet(this.highestBet);
         this.raises++;
+        this.gameManager.updateMoney([this.playersInOrder()[0].GetMoney(), this.playersInOrder()[1].GetMoney()], this.pot);
+        this.gameManager.updateAction(player.GetIndex(), "RAISE");  
         console.log("Raise success")
         return true;
     }
     public override Fold(player: Player): boolean {
         player.SetLive(false);
         player.SetActive(false);
+        this.gameManager.updateAction(player.GetIndex(), "FOLD");
         console.log("Fold success")
         return true;
     }
@@ -111,6 +124,7 @@ export class FixLimitStake extends Stake{
         console.log("Check attempt")
         if(this.opened) return false;
         this.checkCount++;
+        this.gameManager.updateAction(player.GetIndex(), "CHECK");
         console.log("Check success")
         return true;
     }
@@ -140,6 +154,16 @@ export class FixLimitStake extends Stake{
         }
         )
         return activePlayers>1;
+    }
+
+    private playersInOrder(): Player[]{
+        let playersInOrder=[];
+        for(let i=0; i<this.players.length; i++){
+            for(let j=0; j<this.players.length; j++){
+                if(this.players[j].GetIndex() == i) playersInOrder.push(this.players[j]);
+            }
+        }
+        return playersInOrder;
     }
 
 }

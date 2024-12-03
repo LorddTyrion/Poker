@@ -10,6 +10,7 @@ import { IGame } from './poker-squares-init';
 import { logError } from '../../models/log';
 import { GameManager } from '../../models/game-manager';
 import {Button} from './button';
+import styleSheet from '../../assets/font.json';
 
 export class Map extends PIXI.Container {
   private columns: Slot[] = [];
@@ -17,11 +18,17 @@ export class Map extends PIXI.Container {
   private rows: PokerRow[] = [];
   private mistakes: number = 0;
   private britishScore: number = 0;
+  private winnerIndex: number=0;
   public deckSlot: Deck;
   private showSlot: ShowSlot;
   private moveInfo: ICardMoveInfo;
   private bg: PIXI.Graphics;
-  private chip: Chip;
+  private chips: Chip[]=[];
+  private chipText1: PIXI.Text;
+  private chipText2: PIXI.Text;
+  private actionText1: PIXI.Text;
+  private actionText2: PIXI.Text;
+  private potText: PIXI.Text;
   public raiseButton: Button;
   public callButton: Button;
   public foldButton: Button;
@@ -40,10 +47,8 @@ export class Map extends PIXI.Container {
     this.sortableChildren = true;
     this.gameManager=new GameManager(this);
 
-
-    /*this.chip=new Chip(this.game.loader);
-    this.chip.position.set(500,500);
-    this.addChild(this.chip);*/
+    //this.onEnded.apply(() => console.log("END"));
+    
     this.raiseButton = new Button({ label: "Bet / Raise" }, this.game.loader);
     this.raiseButton.position.set((this.game.dim.w - this.raiseButton.getBounds().width) -100 ,(this.game.dim.h - this.raiseButton.getBounds().height)  - 100);
     this.addChild(this.raiseButton);
@@ -55,7 +60,7 @@ export class Map extends PIXI.Container {
     this.foldButton = new Button({ label: "Fold" }, this.game.loader);
     this.foldButton.position.set((this.game.dim.w - this.foldButton.getBounds().width) -100 ,(this.game.dim.h - 3.3* this.foldButton.getBounds().height)  - 100);
     this.addChild(this.foldButton);
-    //raiseButton.addClickListener(( _=> console.log("Új cucc")));
+    
    
     
 
@@ -67,15 +72,7 @@ export class Map extends PIXI.Container {
     }
 
     const offset = 300;
-    /*for (let i = 0; i < 5; i++) {
-      for (let j = 0; j < 5; j++) {
-        const newSlot = new Slot(this, this.rows[i], this.rows[5 + j], i * 5 + j);
-        const padding = newSlot.getBounds().width * 0.1;
-        newSlot.position.set(offset + i * (newSlot.getBounds().width + padding), j * (newSlot.getBounds().height + padding));
-        this.slotContainer.addChild(newSlot);
-        this.columns.push(newSlot);
-      }
-    }*/
+   
 
     //Player 1
     const slot1 = new Slot(this, this.rows[0], this.rows[0], 1);
@@ -120,6 +117,46 @@ export class Map extends PIXI.Container {
       this.deckSlot.flopSlots.push(newSlot);
       this.communitySlots.push(newSlot);
     }
+
+    const style={
+      fontFamily: styleSheet.fontFamily,
+      fontSize: 30,
+      wordWrap: true,
+      wordWrapWidth: Math.min(this.game.dim.w * 0.8, 500),
+      align: 'center',
+    };
+
+    const chipstart = this.deckSlot.getBounds().width * 0.1 + offset;
+    const chip1= new Chip(this.game.loader);
+    chip1.position.set(chipstart, (this.game.dim.h - slot1.getBounds().height)  - 100);
+    this.chips.push(chip1);
+    this.addChild(chip1);
+
+    this.chipText1 = new PIXI.Text("", style);
+    this.chipText1.position.set(chipstart + chip1.getBounds().width + 20, (this.game.dim.h - slot1.getBounds().height)  - 100);
+    this.addChild(this.chipText1);
+
+    const actionstart = chipstart + chip1.getBounds().width + offset;
+    this.actionText1= new PIXI.Text("", style);
+    this.actionText1.position.set(actionstart, (this.game.dim.h - slot1.getBounds().height)  - 100);
+    this.addChild(this.actionText1);
+
+    const chip2= new Chip(this.game.loader);
+    chip2.position.set(chipstart, slot3.getBounds().height  - 100);
+    this.chips.push(chip2);
+    this.addChild(chip2);
+
+    this.chipText2 = new PIXI.Text("", style);
+    this.chipText2.position.set(chipstart + chip2.getBounds().width +20, slot3.getBounds().height  - 100);
+    this.addChild(this.chipText2);
+
+    this.actionText2 = new PIXI.Text("", style);
+    this.actionText2.position.set(actionstart, slot3.getBounds().height  - 100);
+    this.addChild(this.actionText2);
+
+    this.potText = new PIXI.Text("Pot: 0", style);
+    this.potText.position.set((this.game.dim.w - this.foldButton.getBounds().width -200),(this.game.dim.h - 4.4* this.foldButton.getBounds().height)  - 100);
+    this.addChild(this.potText);
 
     this.game.specificLog.nextRound();
 
@@ -257,6 +294,32 @@ export class Map extends PIXI.Container {
     });
   }
 
+  public updateTexts(chipTexts: string[], potText: string){
+    this.chipText1.text = chipTexts[0];
+    this.chipText2.text = chipTexts[1];
+    this.potText.text = "Pot: "+potText;
+  }
+
+  public updateActionTexts(index: number, action: string){
+    if(index == 0){
+      this.actionText1.text = action;
+      this.actionText2.text = "";
+    }
+    else{
+      this.actionText1.text = "";
+      this.actionText2.text = action;
+    }
+  }
+
+  public updateTurn(index: number){
+    if(index == 0){
+      this.actionText1.text = "Your turn!";
+    }
+    else{
+      this.actionText2.text = "Opponent's turn!";
+    }
+  }
+
   @logError()
   public checkForMistakes(card: Card, col: number, row: number, achieved: number) {
     for (let i = 0; i < this.rows.length; i++) {
@@ -302,17 +365,23 @@ export class Map extends PIXI.Container {
 
     return ended;
   }
-  public calculateWinner(){
-    let communityCards=[];
-    for(let i=0; i<this.communitySlots.length; i++){
-      communityCards.push(this.communitySlots[i].cards[0]);
-    }
-    let bestHand1= this.gameManager.chooseBestHand(this.columns[0].cards[0], this.columns[1].cards[0], communityCards);
-    let bestHand2= this.gameManager.chooseBestHand(this.columns[2].cards[0], this.columns[3].cards[0], communityCards);
-    if(bestHand1>bestHand2){
-      console.log("Player 1 wins");
-    }
-    else console.log("Player 2 wins");
+  public endGame(winner: number){
+    this.winnerIndex=winner;
+    this.interactive = false;
+      this.interactiveChildren = false;
+      setTimeout(() => {
+        while (this.children.length > 1) {
+          this.removeChildAt(this.children.length - 1);
+        }
+
+        this.game.specificLog.setMistakes(this.mistakes);
+        this.game.specificLog.setScore(this.britishScore);
+        this.onEnded();
+      }, 1000);
+    
+  }
+  public humanPlayerWon(): boolean{
+    return this.winnerIndex==0;
   }
 
   public getCommunityCards(): Card[]{
