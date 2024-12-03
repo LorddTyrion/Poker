@@ -4,7 +4,6 @@ import { Controller } from './controller';
 import { PokerSquaresLog } from '../../models/game-models/poker-squares-log';
 import { ErrorLogger, IBaseErrorLog, IErrorLog, Log, Logger } from '../../models/log';
 import { init, res, version } from './poker-squares-init';
-import { ScoreCalculator } from '../../scoreCalculator';
 import * as PIXI from 'pixi.js';
 import config from './config.json';
 import { Interruptable } from './game-panel';
@@ -171,94 +170,7 @@ export class ComponentGamePokerSquares implements Interruptable, ErrorLogger {
     );
   }
 
-  public calculateScore() {
-
-    const displayedpercentages = [];
-		const realPercentages = [];
-		const goodValuesPerLevel = [];
-		const valuesPerLevel = [];
-		const acceptableValuesPerLevel = [];
-		const weightsPerLevel = [];
-    const mentalPercentages = [];
-    const duration = this.controller.gamePanel.recentTime;
-
-		// calculating scores for every level just in class planar
-		// transforming the level specific scores into percentages
-		// e.g.: 400 displayed score on level 0 is 50% (halfway to the maximum of 600 and the minimum of 200)
-    for (let i = 0; i < this.specificLog.rounds.length; i++) {
-			const goodValues = [];
-			const values = [];
-			const acceptableValues = [];
-			const weights = [];
-			
-      //nofWrongCheck
-      goodValues.push(config[i].mistakes.good);
-      values.push(this.specificLog.rounds[i].nofMistakes);
-      acceptableValues.push(config[i].mistakes.acceptable);
-      weights.push(config[i].mistakes.weight);
-      //playTime
-      goodValues.push(config[i].playTime.good);
-      values.push(this.specificLog.rounds[i].playTime / 1000);
-      acceptableValues.push(config[i].playTime.acceptable);
-      weights.push(config[i].playTime.weight);
-
-      //100 - bristish score
-      goodValues.push(config[i].britishScore.good);
-      values.push(100-this.specificLog.rounds[i].britishScore);
-      acceptableValues.push(config[i].britishScore.acceptable);
-      weights.push(config[i].britishScore.weight);
-
-			goodValuesPerLevel.push(goodValues);
-			valuesPerLevel.push(values);
-			acceptableValuesPerLevel.push(acceptableValues);
-			weightsPerLevel.push(weights);
-
-			const calculator = new ScoreCalculator(this.controller.maxRounds - 1, i);
-
-			const localDisplayedScore = calculator.getDisplayedScore(goodValues, values, acceptableValues, weights);
-			const localRealScore = calculator.getRealScore(goodValues, values, acceptableValues, weights);
-      const localMfScore = calculator.getMFScore(goodValues, values, acceptableValues, weights);
-			displayedpercentages.push((localDisplayedScore - 200) / (400 + i * 400));
-			realPercentages.push((localRealScore) / (600 + i * 400));
-      mentalPercentages.push((localMfScore-localRealScore/1000) / (((600 + i * 400 ) * 0.85) /10))
-      //mf = (displayed * 0.85 + real/100) /10   ((400 + i * 200) * 0.85 + (600 + i * 200)/100) /10
-		}
-		let displayedScore = 1000 * (displayedpercentages.reduce((prev, curr) => prev + curr, 0) / this.controller.maxRounds);
-		let realScore = 1000 * (realPercentages.reduce((prev, curr) => prev + curr, 0) / this.controller.maxRounds);
-		let mentalScore = Math.round(85 * (mentalPercentages.reduce((prev, curr) => prev + curr, 0) / this.controller.maxRounds));
-		displayedScore = Math.round(displayedScore);
-		realScore = Math.round(realScore);
-    this.log.mf_score = mentalScore;
-		this.log.score = realScore;
-    
-    this.stats = { duration: duration, score: realScore, mentalScore: mentalScore, log: this.log };
-    return mentalScore;
-		/*const goodValues = [];
-		const values = [];
-		const acceptableValues = [];
-		const weights = [];
-    const diff = this.difficulty;
-
-    goodValues.push(config[diff].playTime.good);
-    values.push(0);
-    acceptableValues.push(config[diff].playTime.acceptable);
-    weights.push(config[diff].playTime.weight);
-
-		const calculator = new ScoreCalculator(2, diff);
-		const displayedScore = calculator.getDisplayedScore(goodValues, values, acceptableValues, weights);
-		const realScore = calculator.getRealScore(goodValues, values, acceptableValues, weights);
-    this.log.score = realScore;
-
-    this.scores =  {
-			displayed: displayedScore,
-			real: realScore
-		}
-    let mF = calculator.getMFScore(goodValues, values, acceptableValues, weights);
-    this.log.mf_score = mF;
-    let duration = new Date().getTime() - new Date(this.log.start_time).getTime() - this.log.pause_time;
-    this.stats = { duration: duration, score: realScore, mentalScore: mF, log: this.log };
-    return mF;*/
-	};
+ 
 
   sendMessage() {
     if (!this.stats) return;

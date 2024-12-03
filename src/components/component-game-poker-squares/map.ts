@@ -263,7 +263,6 @@ export class Map extends PIXI.Container {
         }
         slot.addCard(this.moveInfo.cards);
         this.moveInfo = null;
-        this.checkFinish();
         return;
       }
     }
@@ -290,7 +289,6 @@ export class Map extends PIXI.Container {
       this.showSlot.cards[0].position.set(0, 0);
       this.columns[idx].addCard([this.showSlot.cards[0]]);
       Map.canMoveCard = true;
-      this.checkFinish();
     });
   }
 
@@ -320,51 +318,7 @@ export class Map extends PIXI.Container {
     }
   }
 
-  @logError()
-  public checkForMistakes(card: Card, col: number, row: number, achieved: number) {
-    for (let i = 0; i < this.rows.length; i++) {
-      let rowCards: Card[] = [];
-      for (const card of this.rows[i].cards) {
-        rowCards.push(card);
-      }
-      if (rowCards.length != 4) continue;
-      if (col == i || row == i - 5) continue;
-      let prevScore = this.rows[i].calculateScore(rowCards);
-      rowCards.push(card);
-      let score = this.rows[i].calculateScore(rowCards);
-      if (achieved >= score) continue;
-      if (prevScore >= score && (prevScore == 16 || prevScore == 10 || prevScore == 6)) continue;
-      if (score >= 5 && score <= 6) this.mistakes++;
-      else if (score >= 10 && score <= 12) this.mistakes += 2;
-      else if (score >= 16 && score <= 30) this.mistakes += 3;
-    }
-  }
-
-  @logError()
-  public checkFinish() {
-    let ended = true;
-    for (const row of this.rows) {
-      if (row.cards.length < 5) {
-        ended = false;
-        break;
-      }
-    }
-    if (ended) {
-      this.interactive = false;
-      this.interactiveChildren = false;
-      setTimeout(() => {
-        while (this.children.length > 1) {
-          this.removeChildAt(this.children.length - 1);
-        }
-
-        this.game.specificLog.setMistakes(this.mistakes);
-        this.game.specificLog.setScore(this.britishScore);
-        this.onEnded();
-      }, 1000);
-    }
-
-    return ended;
-  }
+  
   public endGame(winner: number){
     this.winnerIndex=winner;
     this.interactive = false;
@@ -387,6 +341,7 @@ export class Map extends PIXI.Container {
   public getCommunityCards(): Card[]{
     let communityCards=[];
     for(let i=0; i<this.communitySlots.length; i++){
+      if(this.communitySlots[i].cards[0] == null) continue;
       communityCards.push(this.communitySlots[i].cards[0]);
     }
     return communityCards;

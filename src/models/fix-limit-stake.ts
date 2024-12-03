@@ -138,7 +138,6 @@ export class FixLimitStake extends Stake{
         }
         )
         if(this.opened && !areThereLivePlayers){
-            //console.log("Failed at 1", this.opened, areThereLivePlayers);
             return false;
         } 
         if(!this.opened && this.checkCount>=this.players.length){

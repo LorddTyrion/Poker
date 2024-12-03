@@ -9,7 +9,7 @@ export interface IGame {
   custom_lang?: 'hu' | 'en';
   doNarration: boolean;
 
-  calculateScore(): number;
+  //calculateScore(): number;
   sendMessage(): void;
   timeout(): void;
   dispose(): void;
