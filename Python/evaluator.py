@@ -34,7 +34,7 @@ class HandEvaluator:
         losses = 0
         for i in range(num_simulations):
             simulated_hand = np.random.choice(self.remaining_cards, 2, replace=False)
-            simulated_eval = evaluator.evaluate(self.board, simulated_hand)
+            simulated_eval = evaluator.evaluate(self.board, simulated_hand.tolist())
             if base_eval < simulated_eval:
                 wins +=1
             elif base_eval == simulated_eval:
