@@ -52,7 +52,7 @@ class CFR:
         node = self.node_map[info_set]
         # Check if we're at a terminal state
         if node.is_terminal(history):
-            return node.get_terminal_utility(history, cards, fixed_player)     
+            return node.get_terminal_utility(history, cards, fixed_player)
         
         # Get current strategy
         strategy = node.get_strategy(p0 if current_player == 0 else p1)

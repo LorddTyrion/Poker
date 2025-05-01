@@ -9,7 +9,7 @@ class KuhnNode(base.Node):
         # Terminal states: pp (showdown), bp (fold), bb (call), pbp (fold), pbb (call)
         return history in ["pp", "bp", "bb", "pbp", "pbb"]
     def is_chance_node(self, history):
-        return len(history) == 1
+        return False
     def get_terminal_utility(self, history, cards, fixed_player):
     # Return utility from the fixed player's perspective
         if history == "pp":  # Showdown after checks
