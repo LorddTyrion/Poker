@@ -1,3 +1,7 @@
+
+class InfoSet:
+    def __init__(self):
+        self.history = ""
 class Node:
     def __init__(self, info_set, num_actions):
         self.info_set = info_set
