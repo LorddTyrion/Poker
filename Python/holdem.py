@@ -3,6 +3,8 @@ import random
 import deuces
 import evaluator
 from typing import List
+import pandas as pd
+import pickle
 
 class HoldemInfoSet(base.InfoSet):
     def __init__(self):
@@ -72,32 +74,44 @@ class HoldemNode(base.Node):
     
 
 class HoldemCFR(base.CFR):
-    def __init__(self,  num_actions, clustering, action_map = {0: 'p', 1: 'b', 2: 'f'}):
+    def __init__(self,  num_actions, clustering, action_map = {0: 'p', 1: 'b', 2: 'f'}, node_map= {}):
         super().__init__(num_actions, action_map)
         self.num_actions = num_actions
+        self.node_map = node_map
+        self.evaluator = deuces.Evaluator()
         self.clustering: evaluator.HandClustering = clustering
     def create_node(self, info_set):
         return HoldemNode(info_set, self.num_actions)
+    def save_node_map(self, filename="node_map.parquet"):
+        rows = []
+        for key, node in self.node_map.items():
+            rows.append({
+                "key": pickle.dumps(key),
+                "regret_sum": node.regret_sum,
+                "strategy_sum": node.strategy_sum,
+            })
+        df = pd.DataFrame(rows)
+        df.to_parquet(filename, index=False)
+
     def cfr(self, cards: List[List[deuces.Card]], flop: List[deuces.Card], turn: deuces.Card, river: deuces.Card, history: HoldemInfoSet, fixed_player, p0, p1):
-         # Determine current player
+         
         current_player = len(history.get_history()) % 2
         round = history.get_round()
         
         history.clear_clusters()
         history.add_cluster(self.clustering.get_preflop_cluster(cards[current_player]))
-        evaluator = deuces.Evaluator()
         board = []
         if round >=1: # flop
             board +=flop
-            evaluation = evaluator.evaluate(cards[current_player], flop)
+            evaluation = self.evaluator.evaluate(cards[current_player], flop)
             history.add_cluster(self.clustering.get_flop_cluster(evaluation))
         if round >=2: # turn
             board.append(turn)
-            evaluation = evaluator.evaluate(cards[current_player], board)
+            evaluation = self.evaluator.evaluate(cards[current_player], board)
             history.add_cluster(self.clustering.get_turn_cluster(evaluation))
         if round >=3: # river
             board.append(river)
-            evaluation = evaluator.evaluate(cards[current_player], board)
+            evaluation = self.evaluator.evaluate(cards[current_player], board)
             history.add_cluster(self.clustering.get_river_cluster(evaluation))
         
         info_set = history.key()
@@ -159,16 +173,29 @@ class HoldemCFR(base.CFR):
         
         return node_util
 
+
+def load_node_map(filename, num_actions):
+    df = pd.read_parquet(filename)
+    node_map = {}
+    for _, row in df.iterrows():
+        key = pickle.loads(row["key"])
+        info_set = HoldemInfoSet.from_key(key)
+        node = HoldemNode(info_set, num_actions)
+        node.regret_sum = list(row["regret_sum"])
+        node.strategy_sum = list(row["strategy_sum"])
+        node_map[key] = node
+    return node_map
+
 def train(iterations):
     hc = evaluator.HandClustering()
     print("Building lookup tables...")
-    hc.build_preflop_table(100)
+    hc.build_preflop_table(20000, 5)
     print("Building preflop table finished.")
-    hc.build_flop_table(100)
+    hc.build_flop_table(20000, 5)
     print("Building flop table finished.")
-    hc.build_turn_table(100)
+    hc.build_turn_table(20000, 5)
     print("Building turn table finished.")
-    hc.build_river_table(100)
+    hc.build_river_table(20000, 5)
     print("Building river table finished.")
     cfr = HoldemCFR(3, hc, action_map = {0: 'p', 1: 'b', 2:'f'})
     print("Training...")
@@ -188,5 +215,39 @@ def train(iterations):
         if (i+1) % 10 == 0 or i == 0:
             print(f"Completed {i+1} iterations")
     print("Training completed.")
+    cfr.save_node_map("trained_node_map.parquet")
 
-train(100)
+def continue_training(iterations, filename):
+    hc = evaluator.HandClustering()
+    print("Building lookup tables...")
+    hc.build_preflop_table(20000, 5)
+    print("Building preflop table finished.")
+    hc.build_flop_table(20000, 5)
+    print("Building flop table finished.")
+    hc.build_turn_table(20000, 5)
+    print("Building turn table finished.")
+    hc.build_river_table(20000, 5)
+    print("Building river table finished.")
+    print("Continuing training...")
+    loaded_map = load_node_map(filename, 3)
+    cfr = HoldemCFR(3, hc, action_map = {0: 'p', 1: 'b', 2:'f'}, node_map=loaded_map)
+    for i in range(iterations):
+        # Deal random cards
+        deck = deuces.Deck()
+        player1_cards = deck.draw(2)
+        player2_cards = deck.draw(2)
+        cards = [player1_cards, player2_cards]
+        flop = deck.draw(3)
+        [turn, river] = deck.draw(2)
+        info_set1 = HoldemInfoSet()
+        info_set2 = HoldemInfoSet()
+        # # Run CFR for each player
+        cfr.cfr(cards, flop,turn, river, info_set1, 0, 1.0, 1.0)  # For player 0
+        cfr.cfr(cards,flop,turn, river, info_set2, 1, 1.0, 1.0)  # For player 1
+        if (i+1) % 10 == 0 or i == 0:
+            print(f"Completed {i+1} iterations")
+    print("Training completed.")
+    cfr.save_node_map("trained_node_map.parquet")
+
+# train(1000)
+continue_training(9000, "trained_node_map.parquet")

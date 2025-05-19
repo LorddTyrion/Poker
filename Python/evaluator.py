@@ -344,10 +344,10 @@ class HandClustering:
         y = kmeans.fit_predict(X)
         return y
 
-hc = HandClustering()
-hc.build_river_table(1000, 5)
-print(hc.get_river_cluster(7460))
-hc.build_preflop_table(1000, 5)
-deck = Deck()
-hand = deck.draw(2)
-print(hc.get_preflop_cluster(hand))
+# hc = HandClustering()
+# hc.build_river_table(1000, 5)
+# print(hc.get_river_cluster(7460))
+# hc.build_preflop_table(1000, 5)
+# deck = Deck()
+# hand = deck.draw(2)
+# print(hc.get_preflop_cluster(hand))
