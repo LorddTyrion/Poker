@@ -186,16 +186,16 @@ def load_node_map(filename, num_actions):
         node_map[key] = node
     return node_map
 
-def train(iterations):
+def train(iterations, num_clusters, filename):
     hc = evaluator.HandClustering()
     print("Building lookup tables...")
-    hc.build_preflop_table(20000, 5)
+    hc.build_preflop_table(20000, num_clusters)
     print("Building preflop table finished.")
-    hc.build_flop_table(20000, 5)
+    hc.build_flop_table(20000, num_clusters)
     print("Building flop table finished.")
-    hc.build_turn_table(20000, 5)
+    hc.build_turn_table(20000, num_clusters)
     print("Building turn table finished.")
-    hc.build_river_table(20000, 5)
+    hc.build_river_table(20000, num_clusters)
     print("Building river table finished.")
     cfr = HoldemCFR(3, hc, action_map = {0: 'p', 1: 'b', 2:'f'})
     print("Training...")
@@ -215,18 +215,18 @@ def train(iterations):
         if (i+1) % 10 == 0 or i == 0:
             print(f"Completed {i+1} iterations")
     print("Training completed.")
-    cfr.save_node_map("trained_node_map.parquet")
+    cfr.save_node_map(filename)
 
-def continue_training(iterations, filename):
+def continue_training(iterations, num_clusters, filename):
     hc = evaluator.HandClustering()
     print("Building lookup tables...")
-    hc.build_preflop_table(20000, 5)
+    hc.build_preflop_table(20000, num_clusters)
     print("Building preflop table finished.")
-    hc.build_flop_table(20000, 5)
+    hc.build_flop_table(20000, num_clusters)
     print("Building flop table finished.")
-    hc.build_turn_table(20000, 5)
+    hc.build_turn_table(20000, num_clusters)
     print("Building turn table finished.")
-    hc.build_river_table(20000, 5)
+    hc.build_river_table(20000, num_clusters)
     print("Building river table finished.")
     print("Continuing training...")
     loaded_map = load_node_map(filename, 3)
@@ -247,7 +247,7 @@ def continue_training(iterations, filename):
         if (i+1) % 10 == 0 or i == 0:
             print(f"Completed {i+1} iterations")
     print("Training completed.")
-    cfr.save_node_map("trained_node_map.parquet")
+    cfr.save_node_map(filename)
 
-# train(1000)
-continue_training(9000, "trained_node_map.parquet")
+# train(1000, 6, "trained_node_map_6.parquet")
+continue_training(20000, 6,  "trained_node_map_6.parquet")
