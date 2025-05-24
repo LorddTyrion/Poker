@@ -11,7 +11,7 @@ class HoldemInfoSet(base.InfoSet):
         self.history=["", "", "", ""]
         self.clusters=[]
         self.round = 0
-        self.pot = [0,0]
+        self.pot = [1,1]
     def set_history(self, value):
         self.history[self.round] = value
     def get_history(self):
@@ -250,4 +250,4 @@ def continue_training(iterations, num_clusters, filename):
     cfr.save_node_map(filename)
 
 # train(1000, 6, "trained_node_map_6.parquet")
-continue_training(20000, 5,  "trained_node_map.parquet")
+# continue_training(20000, 5,  "trained_node_map.parquet")
