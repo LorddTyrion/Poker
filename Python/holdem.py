@@ -249,5 +249,5 @@ def continue_training(iterations, num_clusters, filename):
     print("Training completed.")
     cfr.save_node_map(filename)
 
-# train(1000, 6, "trained_node_map_6.parquet")
-# continue_training(20000, 5,  "trained_node_map.parquet")
+# train(20000, 6, "with_antes_6.parquet")
+# continue_training(10000, 6,  "with_antes_6.parquet")

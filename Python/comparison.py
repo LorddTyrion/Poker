@@ -113,8 +113,8 @@ hc5.build_river_table(20000, 5)
 hc6.build_river_table(20000, 6)
 print("Building river table finished.")
 
-cfr5 = holdem.HoldemCFR(3, hc5, action_map={0: 'p', 1: 'b', 2: 'f'}, node_map=holdem.load_node_map("trained_node_map.parquet", 3))
-cfr6 = holdem.HoldemCFR(3, hc6, action_map={0: 'p', 1: 'b', 2: 'f'}, node_map=holdem.load_node_map("trained_node_map_6.parquet", 3))
+cfr5 = holdem.HoldemCFR(3, hc5, action_map={0: 'p', 1: 'b', 2: 'f'}, node_map=holdem.load_node_map("with_antes_5.parquet", 3))
+cfr6 = holdem.HoldemCFR(3, hc6, action_map={0: 'p', 1: 'b', 2: 'f'}, node_map=holdem.load_node_map("with_antes_6.parquet", 3))
 
-results = evaluate_models(cfr5, cfr6, hc5, hc6, num_games=10000)
+results = evaluate_models(cfr5, cfr6, hc5, hc6, num_games=100000)
 print("Evaluation Results:", results)
