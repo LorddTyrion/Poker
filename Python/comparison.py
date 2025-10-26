@@ -82,14 +82,14 @@ def play_hand(cfr_player0, cfr_player1, hc5, hc6):
 
         current_player = 1 - current_player
 
-def evaluate_models(cfr5, cfr6, hc5, hc6, num_games=10000):
-    results = {"cfr5_win": 0, "cfr6_win": 0, "tie": 0, "total": 0}
+def evaluate_models(cfr_lower, cfr_higher, hc_lower, hc_higher, num_games=10000):
+    results = {"cfrlow_win": 0, "cfrhigh_win": 0, "tie": 0, "total": 0}
     for i in range(num_games):
-        result = play_hand(cfr5, cfr6, hc5, hc6)
+        result = play_hand(cfr_lower, cfr_higher, hc_lower, hc_higher)
         if result > 0:
-            results["cfr5_win"] += 1
+            results["cfrlow_win"] += 1
         elif result < 0:
-            results["cfr6_win"] += 1
+            results["cfrhigh_win"] += 1
         else:
             results["tie"] += 1
         results["total"] += 1
@@ -97,24 +97,44 @@ def evaluate_models(cfr5, cfr6, hc5, hc6, num_games=10000):
             print(f"Played {i+1} games")
     return results
 
-hc5 = evaluator.HandClustering()
-hc6 = evaluator.HandClustering()
+# hc5 = evaluator.HandClustering()
+# hc6 = evaluator.HandClustering()
+# print("Building lookup tables...")
+# hc5.build_preflop_table(20000, 5)
+# hc6.build_preflop_table(20000, 6)
+# print("Building preflop table finished.")
+# hc5.build_flop_table(20000, 5)
+# hc6.build_flop_table(20000, 6)
+# print("Building flop table finished.")
+# hc5.build_turn_table(20000, 5)
+# hc6.build_turn_table(20000, 6)
+# print("Building turn table finished.")
+# hc5.build_river_table(20000, 5)
+# hc6.build_river_table(20000, 6)
+# print("Building river table finished.")
+
+hc =evaluator.HandClustering()
+
+
 print("Building lookup tables...")
-hc5.build_preflop_table(20000, 5)
-hc6.build_preflop_table(20000, 6)
-print("Building preflop table finished.")
-hc5.build_flop_table(20000, 5)
-hc6.build_flop_table(20000, 6)
-print("Building flop table finished.")
-hc5.build_turn_table(20000, 5)
-hc6.build_turn_table(20000, 6)
-print("Building turn table finished.")
-hc5.build_river_table(20000, 5)
-hc6.build_river_table(20000, 6)
-print("Building river table finished.")
+hc.build_preflop_table(20000, 5)
+hc.build_flop_table(20000, 5)
+hc.build_turn_table(20000, 5)
+hc.build_river_table(20000, 5)
+print("Building lookup tables finished.")
 
-cfr5 = holdem.HoldemCFR(3, hc5, action_map={0: 'p', 1: 'b', 2: 'f'}, node_map=holdem.load_node_map("with_antes_5.parquet", 3))
-cfr6 = holdem.HoldemCFR(3, hc6, action_map={0: 'p', 1: 'b', 2: 'f'}, node_map=holdem.load_node_map("with_antes_6.parquet", 3))
+cfr1 = holdem.HoldemCFR(3, hc, action_map={0: 'p', 1: 'b', 2: 'f'}, node_map=holdem.load_node_map("bucket_5_1k.parquet", 3))
+cfr10 = holdem.HoldemCFR(3, hc, action_map={0: 'p', 1: 'b', 2: 'f'}, node_map=holdem.load_node_map("bucket_5_10k.parquet", 3))
+cfr20 = holdem.HoldemCFR(3, hc, action_map={0: 'p', 1: 'b', 2: 'f'}, node_map=holdem.load_node_map("bucket_5_20k.parquet", 3))
+cfr30 = holdem.HoldemCFR(3, hc, action_map={0: 'p', 1: 'b', 2: 'f'}, node_map=holdem.load_node_map("bucket_5_30k.parquet", 3))
+cfr50 = holdem.HoldemCFR(3, hc, action_map={0: 'p', 1: 'b', 2: 'f'}, node_map=holdem.load_node_map("bucket_5_50k.parquet", 3))
 
-results = evaluate_models(cfr5, cfr6, hc5, hc6, num_games=100000)
-print("Evaluation Results:", results)
+cfr_list = [cfr1, cfr10, cfr20, cfr30, cfr50]
+results = []
+for i in range(len(cfr_list)):
+    for j in range (i+1, len(cfr_list)):
+        result = evaluate_models(cfr_list[i], cfr_list[j], hc, hc, num_games=100000)
+        print("Evaluation Results:", result)
+        results.append(result)
+
+#print("Evaluation Results:", results)

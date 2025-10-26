@@ -29,11 +29,13 @@ class Node:
             return [s / normalizing_sum for s in self.strategy_sum]
         else:
             return [(1.0/self.num_actions) for i in range(self.num_actions)]
-    
+    @staticmethod
     def is_terminal(self, history):
         raise NotImplementedError
+    @staticmethod
     def is_chance_node(self, history):
         raise NotImplementedError
+    @staticmethod
     def get_terminal_utility(self, history, cards, fixed_player):
         raise NotImplementedError
     
