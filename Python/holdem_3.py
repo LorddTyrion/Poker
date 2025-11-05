@@ -341,3 +341,5 @@ def train(iterations, num_clusters, num_players, filename):
     
     print("Training completed.")
     cfr.save_node_map(filename)
+
+train(100, 5, 3, "proba.parquet")

@@ -39,6 +39,6 @@ def make_clusters(num_clusters, board_size):
 # cards = deck.draw(2)
 # board=[]
 # eval = evaluator.evaluate(cards, board)
-print(make_clusters(5, 3))
+# print(make_clusters(5, 3))
 
 

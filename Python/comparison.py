@@ -2,6 +2,7 @@ import random
 import deuces
 import holdem
 import evaluator
+from rule_based_models import RuleBasedModel, RuleBasedNode
 
 def play_hand(cfr_player0, cfr_player1, hc5, hc6):
     deck = deuces.Deck()
@@ -39,10 +40,15 @@ def play_hand(cfr_player0, cfr_player1, hc5, hc6):
 
         info_set_key = history.key()
         model = cfr_player0 if current_player == 0 else cfr_player1
-        if info_set_key not in model.node_map:
+
+        
+        if isinstance(model, RuleBasedModel):
+            node = RuleBasedNode(info_set_key, model.strategy)
+        elif info_set_key not in model.node_map:
             node = holdem.HoldemNode(info_set_key, 3)
             model.node_map[info_set_key] = node
-        node = model.node_map[info_set_key]
+        else:
+            node = model.node_map[info_set_key]
 
         # Terminal state?
         if node.is_terminal(history):
@@ -97,6 +103,17 @@ def evaluate_models(cfr_lower, cfr_higher, hc_lower, hc_higher, num_games=10000)
             print(f"Played {i+1} games")
     return results
 
+def evaluate_models_by_sum(cfr0, cfr1, hc0, hc1, num_games=10000):
+    results = {"player0_utility": 0, "player1_utility": 0, "total": 0}
+    for i in range(num_games):
+        result = play_hand(cfr0, cfr1, hc0, hc1)
+        results["player0_utility"] += result
+        results["total"] += 1
+        if (i + 1) % 1000 == 0:
+            print(f"Played {i+1} games")
+    results["player1_utility"] = - results["player0_utility"]  
+    return results
+
 # hc5 = evaluator.HandClustering()
 # hc6 = evaluator.HandClustering()
 # print("Building lookup tables...")
@@ -113,7 +130,7 @@ def evaluate_models(cfr_lower, cfr_higher, hc_lower, hc_higher, num_games=10000)
 # hc6.build_river_table(20000, 6)
 # print("Building river table finished.")
 
-hc =evaluator.HandClustering()
+hc = evaluator.HandClustering()
 
 
 print("Building lookup tables...")
@@ -123,18 +140,32 @@ hc.build_turn_table(20000, 5)
 hc.build_river_table(20000, 5)
 print("Building lookup tables finished.")
 
+action_map = {0: 'p', 1: 'b', 2: 'f'}
+
+always_call_model = RuleBasedModel(
+    action_map=action_map,
+    strategy=[1.0, 0.0, 0.0]  # 100% call/check, 0% bet/raise, 0% fold
+)
+
+# Always Raise model: bets/raises (action 1) with 100% probability
+always_raise_model = RuleBasedModel(
+    action_map=action_map,
+    strategy=[0.0, 1.0, 0.0]  # 0% call/check, 100% bet/raise, 0% fold
+)
+
 cfr1 = holdem.HoldemCFR(3, hc, action_map={0: 'p', 1: 'b', 2: 'f'}, node_map=holdem.load_node_map("bucket_5_1k.parquet", 3))
 cfr10 = holdem.HoldemCFR(3, hc, action_map={0: 'p', 1: 'b', 2: 'f'}, node_map=holdem.load_node_map("bucket_5_10k.parquet", 3))
 cfr20 = holdem.HoldemCFR(3, hc, action_map={0: 'p', 1: 'b', 2: 'f'}, node_map=holdem.load_node_map("bucket_5_20k.parquet", 3))
 cfr30 = holdem.HoldemCFR(3, hc, action_map={0: 'p', 1: 'b', 2: 'f'}, node_map=holdem.load_node_map("bucket_5_30k.parquet", 3))
 cfr50 = holdem.HoldemCFR(3, hc, action_map={0: 'p', 1: 'b', 2: 'f'}, node_map=holdem.load_node_map("bucket_5_50k.parquet", 3))
 
-cfr_list = [cfr1, cfr10, cfr20, cfr30, cfr50]
+cfr_list = [always_call_model, always_raise_model, cfr1, cfr10, cfr20, cfr30, cfr50]
 results = []
 for i in range(len(cfr_list)):
     for j in range (i+1, len(cfr_list)):
-        result = evaluate_models(cfr_list[i], cfr_list[j], hc, hc, num_games=100000)
+        result = evaluate_models_by_sum(cfr_list[i], cfr_list[j], hc, hc, num_games=10000)
         print("Evaluation Results:", result)
         results.append(result)
 
 #print("Evaluation Results:", results)
+

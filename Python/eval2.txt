@@ -1,0 +1,232 @@
+Building lookup tables finished.
+Played 1000 games
+Played 2000 games
+Played 3000 games
+Played 4000 games
+Played 5000 games
+Played 6000 games
+Played 7000 games
+Played 8000 games
+Played 9000 games
+Played 10000 games
+Evaluation Results: {'player0_utility': 2390, 'player1_utility': -2390, 'total': 10000}
+Played 1000 games
+Played 2000 games
+Played 3000 games
+Played 4000 games
+Played 5000 games
+Played 6000 games
+Played 7000 games
+Played 8000 games
+Played 9000 games
+Played 10000 games
+Evaluation Results: {'player0_utility': -2976, 'player1_utility': 2976, 'total': 10000}
+Played 1000 games
+Played 2000 games
+Played 3000 games
+Played 4000 games
+Played 5000 games
+Played 6000 games
+Played 7000 games
+Played 8000 games
+Played 9000 games
+Played 10000 games
+Evaluation Results: {'player0_utility': 308, 'player1_utility': -308, 'total': 10000}
+Played 1000 games
+Played 2000 games
+Played 3000 games
+Played 4000 games
+Played 5000 games
+Played 6000 games
+Played 7000 games
+Played 8000 games
+Played 9000 games
+Played 10000 games
+Evaluation Results: {'player0_utility': 243, 'player1_utility': -243, 'total': 10000}
+Played 1000 games
+Played 2000 games
+Played 3000 games
+Played 4000 games
+Played 5000 games
+Played 6000 games
+Played 7000 games
+Played 8000 games
+Played 9000 games
+Played 10000 games
+Evaluation Results: {'player0_utility': 295, 'player1_utility': -295, 'total': 10000}
+Played 1000 games
+Played 2000 games
+Played 3000 games
+Played 4000 games
+Played 5000 games
+Played 6000 games
+Played 7000 games
+Played 8000 games
+Played 9000 games
+Played 10000 games
+Evaluation Results: {'player0_utility': 233, 'player1_utility': -233, 'total': 10000}
+Played 1000 games
+Played 2000 games
+Played 3000 games
+Played 4000 games
+Played 5000 games
+Played 6000 games
+Played 7000 games
+Played 8000 games
+Played 9000 games
+Played 10000 games
+Evaluation Results: {'player0_utility': -18983, 'player1_utility': 18983, 'total': 10000}
+Played 1000 games
+Played 2000 games
+Played 3000 games
+Played 4000 games
+Played 5000 games
+Played 6000 games
+Played 7000 games
+Played 8000 games
+Played 9000 games
+Played 10000 games
+Evaluation Results: {'player0_utility': -17863, 'player1_utility': 17863, 'total': 10000}
+Played 1000 games
+Played 2000 games
+Played 3000 games
+Played 4000 games
+Played 5000 games
+Played 6000 games
+Played 7000 games
+Played 8000 games
+Played 9000 games
+Played 10000 games
+Evaluation Results: {'player0_utility': -17331, 'player1_utility': 17331, 'total': 10000}
+Played 1000 games
+Played 2000 games
+Played 3000 games
+Played 4000 games
+Played 5000 games
+Played 6000 games
+Played 7000 games
+Played 8000 games
+Played 9000 games
+Played 10000 games
+Evaluation Results: {'player0_utility': -17717, 'player1_utility': 17717, 'total': 10000}
+Played 1000 games
+Played 2000 games
+Played 3000 games
+Played 4000 games
+Played 5000 games
+Played 6000 games
+Played 7000 games
+Played 8000 games
+Played 9000 games
+Played 10000 games
+Evaluation Results: {'player0_utility': -17807, 'player1_utility': 17807, 'total': 10000}
+Played 1000 games
+Played 2000 games
+Played 3000 games
+Played 4000 games
+Played 5000 games
+Played 6000 games
+Played 7000 games
+Played 8000 games
+Played 9000 games
+Played 10000 games
+Evaluation Results: {'player0_utility': -7397, 'player1_utility': 7397, 'total': 10000}
+Played 1000 games
+Played 2000 games
+Played 3000 games
+Played 4000 games
+Played 5000 games
+Played 6000 games
+Played 7000 games
+Played 8000 games
+Played 9000 games
+Played 10000 games
+Evaluation Results: {'player0_utility': -7438, 'player1_utility': 7438, 'total': 10000}
+Played 1000 games
+Played 2000 games
+Played 3000 games
+Played 4000 games
+Played 5000 games
+Played 6000 games
+Played 7000 games
+Played 8000 games
+Played 9000 games
+Played 10000 games
+Evaluation Results: {'player0_utility': -7907, 'player1_utility': 7907, 'total': 10000}
+Played 1000 games
+Played 2000 games
+Played 3000 games
+Played 4000 games
+Played 5000 games
+Played 6000 games
+Played 7000 games
+Played 8000 games
+Played 9000 games
+Played 10000 games
+Evaluation Results: {'player0_utility': -8236, 'player1_utility': 8236, 'total': 10000}
+Played 1000 games
+Played 2000 games
+Played 3000 games
+Played 4000 games
+Played 5000 games
+Played 6000 games
+Played 7000 games
+Played 8000 games
+Played 9000 games
+Played 10000 games
+Evaluation Results: {'player0_utility': -1936, 'player1_utility': 1936, 'total': 10000}
+Played 1000 games
+Played 2000 games
+Played 3000 games
+Played 4000 games
+Played 5000 games
+Played 6000 games
+Played 7000 games
+Played 8000 games
+Played 9000 games
+Played 10000 games
+Evaluation Results: {'player0_utility': -2512, 'player1_utility': 2512, 'total': 10000}
+Played 1000 games
+Played 2000 games
+Played 3000 games
+Played 4000 games
+Played 5000 games
+Played 6000 games
+Played 7000 games
+Played 8000 games
+Played 9000 games
+Played 10000 games
+Evaluation Results: {'player0_utility': -2658, 'player1_utility': 2658, 'total': 10000}
+Played 1000 games
+Played 2000 games
+Played 3000 games
+Played 4000 games
+Played 5000 games
+Played 6000 games
+Played 7000 games
+Played 8000 games
+Played 9000 games
+Played 10000 games
+Evaluation Results: {'player0_utility': -1104, 'player1_utility': 1104, 'total': 10000}
+Played 1000 games
+Played 2000 games
+Played 3000 games
+Played 4000 games
+Played 5000 games
+Played 6000 games
+Played 7000 games
+Played 8000 games
+Played 9000 games
+Played 10000 games
+Evaluation Results: {'player0_utility': -1250, 'player1_utility': 1250, 'total': 10000}
+Played 1000 games
+Played 2000 games
+Played 3000 games
+Played 4000 games
+Played 5000 games
+Played 6000 games
+Played 7000 games
+Played 8000 games
+Played 9000 games
+Played 10000 games
+Evaluation Results: {'player0_utility': -883, 'player1_utility': 883, 'total': 10000}
