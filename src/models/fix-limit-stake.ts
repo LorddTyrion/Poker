@@ -5,13 +5,13 @@ import { Player } from "./player";
 export class FixLimitStake extends Stake{
     private bigBets: boolean=false;
     private smallBlind: number=1;
-    private bigBlind: number=2;
-    private smallBetAmount: number=2;
-    private bigBetAmount: number=4;
+    private bigBlind: number=1;
+    private smallBetAmount: number=1;
+    private bigBetAmount: number=1;
     private opened: boolean=true;
     private highestBet: number=0;
     private checkCount: number=0;
-    private maxRaises: number=4;
+    private maxRaises: number=2;
     private raises: number=0;
     constructor(gameManager: GameManager){
         super(gameManager);
@@ -41,13 +41,14 @@ export class FixLimitStake extends Stake{
         for(let i=0; i< this.players.length; i++){
             this.players[i].SetLive(true);
             this.players[i].SetActive(true);
-            if(i==1) {
-                this.players[i].SetLive(false);
-                continue;
-            }
-            this.players[i].SetLive(true);
+            // if(i==1) {
+            //     this.players[i].SetLive(false);
+            //     continue;
+            // }
+            // this.players[i].SetLive(true);
+            this.players[i].SetLive(false);
         }
-        this.opened=true;
+        this.opened=false;
     }
     public override Bet(amount: number, player: Player): boolean{
         console.log("Bet attempt")
@@ -66,7 +67,7 @@ export class FixLimitStake extends Stake{
             this.players[i].SetLive(true);
         }
         player.SetLive(false);
-        this.highestBet=actualAmount;
+        this.highestBet+=actualAmount;
         player.SetCurrentBet(actualAmount);
         this.opened=true;
         this.gameManager.updateMoney([this.playersInOrder()[0].GetMoney(), this.playersInOrder()[1].GetMoney()], this.pot); 

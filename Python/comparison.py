@@ -157,13 +157,17 @@ cfr1 = holdem.HoldemCFR(3, hc, action_map={0: 'p', 1: 'b', 2: 'f'}, node_map=hol
 cfr10 = holdem.HoldemCFR(3, hc, action_map={0: 'p', 1: 'b', 2: 'f'}, node_map=holdem.load_node_map("bucket_5_10k.parquet", 3))
 cfr20 = holdem.HoldemCFR(3, hc, action_map={0: 'p', 1: 'b', 2: 'f'}, node_map=holdem.load_node_map("bucket_5_20k.parquet", 3))
 cfr30 = holdem.HoldemCFR(3, hc, action_map={0: 'p', 1: 'b', 2: 'f'}, node_map=holdem.load_node_map("bucket_5_30k.parquet", 3))
-cfr50 = holdem.HoldemCFR(3, hc, action_map={0: 'p', 1: 'b', 2: 'f'}, node_map=holdem.load_node_map("bucket_5_50k.parquet", 3))
+cfr50 = holdem.HoldemCFR(3, hc, action_map={0: 'p', 1: 'b', 2: 'f'}, node_map=holdem.load_node_map("bucket_5_50k_2.parquet", 3))
+cfr_against_calling_station = holdem.HoldemCFR(3, hc, action_map, node_map=holdem.load_node_map("against_calling_machine_50k.parquet", 3))
 
-cfr_list = [always_call_model, always_raise_model, cfr1, cfr10, cfr20, cfr30, cfr50]
+#cfr_list = [always_call_model, always_raise_model, cfr1, cfr10, cfr20, cfr30, cfr50]
+cfr_list = [always_call_model, cfr50]
 results = []
 for i in range(len(cfr_list)):
     for j in range (i+1, len(cfr_list)):
-        result = evaluate_models_by_sum(cfr_list[i], cfr_list[j], hc, hc, num_games=10000)
+        result = evaluate_models_by_sum(cfr_list[i], cfr_list[j], hc, hc, num_games=20000)
+        print("Evaluation Results:", result)
+        result = evaluate_models_by_sum(cfr_list[j], cfr_list[i], hc, hc, num_games=20000)
         print("Evaluation Results:", result)
         results.append(result)
 

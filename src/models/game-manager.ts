@@ -59,7 +59,7 @@ export class GameManager{
     }
     //else this.starter=this.playersActual[2];
     this.stake.collectStarterBets();
-    for(let i = 0; i<2; i++) this.rotatePlayers();
+    //for(let i = 0; i<2; i++) this.rotatePlayers();
     console.log("Game started");
 
   }
@@ -69,17 +69,17 @@ export class GameManager{
 
     this.startGame();
     await this.bettingRound(); //pre-flop
-    this.rotatePlayers();
+    //this.rotatePlayers();
     //flop
     await this.map.deckSlot.dealCards();
     this.stake.initializeRound(false);
     await this.bettingRound();
-    this.rotatePlayers();
+    //this.rotatePlayers();
     //turn
     await this.map.deckSlot.dealCards();
     this.stake.initializeRound(true);
     await this.bettingRound();
-    this.rotatePlayers();
+    //this.rotatePlayers();
     //river
     await this.map.deckSlot.dealCards();
     this.stake.initializeRound(true);

@@ -338,8 +338,13 @@ def train(iterations, num_clusters, num_players, filename):
         
         if (i + 1) % 10 == 0 or i == 0:
             print(f"Completed {i + 1} iterations")
+
+        if(i == 2000):
+            cfr.save_node_map("3_players_2k.parquet")
+        if(i == 5000):
+            cfr.save_node_map("3_players_5k.parquet")
     
     print("Training completed.")
     cfr.save_node_map(filename)
 
-train(100, 5, 3, "proba.parquet")
+train(10000, 5, 3, "3_players_10k.parquet")

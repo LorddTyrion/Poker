@@ -1,9 +1,8 @@
-from deuces import Card
-from deuces import Evaluator
-from deuces import Deck
+from deuces import Card, Evaluator, Deck
+from pathlib import Path
 import numpy as np
-from sklearn.cluster import KMeans
-import itertools
+import pandas as pd
+import os
 import random
 # card = Card.new('Qh')
 # board = [
@@ -338,16 +337,73 @@ class HandClustering:
                     break
             else:
                 self.river_map[i] = num_clusters - 1
+    
+    def save_tables(self, directory="clustering_tables"):
+        Path(directory).mkdir(parents=True, exist_ok=True)
+        
+        if self.preflop_map:
+            df_preflop = pd.DataFrame(list(self.preflop_map.items()), columns=['hand_key', 'cluster'])
+            df_preflop.to_parquet(os.path.join(directory, 'preflop_map.parquet'), index=False)
+            print(f"Saved preflop map with {len(self.preflop_map)} entries")
 
-    def get_clusters(self, num_clusters, X):
-        kmeans = KMeans(n_clusters=num_clusters, random_state=42, n_init="auto").fit(X)
-        y = kmeans.fit_predict(X)
-        return y
+        if self.flop_map:
+            df_flop = pd.DataFrame(list(self.flop_map.items()), columns=['eval', 'cluster'])
+            df_flop.to_parquet(os.path.join(directory, 'flop_map.parquet'), index = False)
+            print(f"Saved flop map with {len(self.flop_map)} entries")
 
-# hc = HandClustering()
-# hc.build_river_table(1000, 5)
-# print(hc.get_river_cluster(7460))
-# hc.build_preflop_table(1000, 5)
-# deck = Deck()
-# hand = deck.draw(2)
-# print(hc.get_preflop_cluster(hand))
+        if self.turn_map:
+            df_turn = pd.DataFrame(list(self.turn_map.items()), columns=['eval', 'cluster'])
+            df_turn.to_parquet(os.path.join(directory, 'turn_map.parquet'), index = False)
+            print(f"Saved turn map with {len(self.turn_map)} entries")
+
+        if self.river_map:
+            df_river = pd.DataFrame(list(self.river_map.items()), columns=['eval', 'cluster'])
+            df_river.to_parquet(os.path.join(directory, 'river_map.parquet'), index = False)
+            print(f"Saved river map with {len(self.river_map)} entries")
+    def load_tables(self, directory="clustering_tables"):
+
+        preflop_path = os.path.join(directory, 'preflop_map.parquet')
+        if os.path.exists(preflop_path):
+            df_preflop = pd.read_parquet(preflop_path)
+            self.preflop_map = dict(zip(df_preflop['hand_key'], df_preflop['cluster']))
+            print(f"Loaded preflop_map with {len(self.preflop_map)} entries")
+        else:
+            print(f"Warning: {preflop_path} not found")
+
+        flop_path = os.path.join(directory, 'flop_map.parquet')
+        if os.path.exists(flop_path):
+            df_flop = pd.read_parquet(flop_path)
+            self.flop_map = dict(zip(df_flop['eval'], df_flop['cluster']))
+            print(f"Loaded flop map with {len(self.flop_map)} entries")
+        else:
+            print(f"Warning: {flop_path} not found")
+
+        turn_path = os.path.join(directory, 'turn_map.parquet')
+        if os.path.exists(turn_path):
+            df_turn = pd.read_parquet(turn_path)
+            self.turn_map = dict(zip(df_turn['eval'], df_turn['cluster']))
+            print(f"Loaded turn map with {len(self.turn_map)} entries")
+        else:
+            print(f"Warning: {turn_path} not found")
+
+        river_path = os.path.join(directory, 'river_map.parquet')
+        if os.path.exists(river_path):
+            df_river = pd.read_parquet(river_path)
+            self.river_map = dict(zip(df_river['eval'], df_river['cluster']))
+            print(f"Loaded river map with {len(self.river_map)} entries")
+        else:
+            print(f"Warning: {river_path} not found")
+
+
+hc = HandClustering()
+print("Building lookup tables...")
+hc.build_preflop_table(20000, 5)
+print("Building preflop table finished.")
+hc.build_flop_table(20000, 5)
+print("Building flop table finished.")
+hc.build_turn_table(20000, 5)
+print("Building turn table finished.")
+hc.build_river_table(20000, 5)
+print("Building river table finished.")
+
+hc.save_tables()

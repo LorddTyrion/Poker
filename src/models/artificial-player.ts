@@ -11,7 +11,7 @@ export class ArtificialPlayer extends Player{
     }
     public override async Step(): Promise<void>{
         let oracle = new Oracle(this.map.gameManager);        
-        let suggestion=oracle.SuggestMove(this.GetCards()[0], this.GetCards()[1], this.map.getCommunityCards());
+        let suggestion= await oracle.SuggestMove(this.GetCards()[0], this.GetCards()[1], this.map.getCommunityCards());
         console.log("step "+suggestion);
         await this.delay(5000);
         

@@ -3,7 +3,7 @@ import { Stake } from "./stake";
 
 export abstract class Player{
     private money: number=20;
-    private betCurrentRound: number;
+    private betCurrentRound: number=0;
     private activePlayer: boolean=true;
     private live: boolean=false;
     private cards: Card[] = [];

@@ -1,10 +1,11 @@
 import base
-import random
 import deuces
 import evaluator
 from typing import List
 import pandas as pd
 import pickle
+
+    
 
 class HoldemInfoSet(base.InfoSet):
     def __init__(self):
@@ -130,7 +131,7 @@ class HoldemCFR(base.CFR):
                
         
         # Get current strategy
-        strategy = node.get_strategy(p0 if current_player == 0 else p1)
+        strategy = node.get_strategy(p0 if current_player == 1 else p1)
         
         # Initialize utility arrays
         util = [0.0, 0.0, 0.0]
@@ -173,6 +174,112 @@ class HoldemCFR(base.CFR):
         
         return node_util
 
+    def cfr_with_fixed_player(self, cards: List[List[deuces.Card]], flop: List[deuces.Card], turn: deuces.Card, river: deuces.Card, history: HoldemInfoSet, fixed_player, opponent_model, p0, p1):
+         
+        current_player = len(history.get_history()) % 2
+        round = history.get_round()
+        
+        history.clear_clusters()
+        history.add_cluster(self.clustering.get_preflop_cluster(cards[current_player]))
+        board = []
+        if round >=1: # flop
+            board +=flop
+            evaluation = self.evaluator.evaluate(cards[current_player], flop)
+            history.add_cluster(self.clustering.get_flop_cluster(evaluation))
+        if round >=2: # turn
+            board.append(turn)
+            evaluation = self.evaluator.evaluate(cards[current_player], board)
+            history.add_cluster(self.clustering.get_turn_cluster(evaluation))
+        if round >=3: # river
+            board.append(river)
+            evaluation = self.evaluator.evaluate(cards[current_player], board)
+            history.add_cluster(self.clustering.get_river_cluster(evaluation))
+        
+        info_set = history.key()
+
+        if current_player == fixed_player:
+            if info_set not in self.node_map:
+                self.node_map[info_set] = self.create_node(info_set)
+            node : HoldemNode = self.node_map[info_set]
+        else:
+            if(isinstance(opponent_model, RuleBasedModel)):
+                node = RuleBasedNode(info_set, opponent_model.strategy)
+       
+       
+        # Check if we're at a terminal state
+        if node.is_terminal(history):
+            return node.get_terminal_utility(history, cards, board, fixed_player)        
+        
+        if node.is_chance_node(history):
+            history.increment_round()
+            return self.cfr_with_fixed_player(cards, flop, turn, river, history, fixed_player, opponent_model, p0, p1)
+            
+               
+        
+        # Get current strategy
+        strategy = node.get_strategy(p0 if current_player == 1 else p1)
+        
+        # Initialize utility arrays
+        util = [0.0, 0.0, 0.0]
+        node_util = 0.0
+        
+        
+        # Recursively calculate utility for each action
+        for a in range(self.num_actions):
+            if history.get_history().count('b') >= 2: # only 2 bets/raises allowed
+                continue
+            next_history = HoldemInfoSet.from_key(info_set)
+            amount_bet = 0
+            if a==0 and (next_history.get_history() == "" or next_history.get_history() == "p"):
+                amount_bet = 0
+            elif a == 0 or (a == 1 and (next_history.get_history() == "" or next_history.get_history() == "p")):
+                amount_bet = 1
+            elif a == 1:
+                amount_bet = 2
+
+            next_history.set_history(next_history.get_history()+(self.action_map[a]))           
+            next_history.add_to_pot(current_player, amount_bet)
+            # Update probabilities based on current player
+            if current_player == 0:
+                util[a] = self.cfr_with_fixed_player(cards, flop, turn, river, next_history, fixed_player, opponent_model, p0 * strategy[a], p1)
+            else:
+                util[a] = self.cfr_with_fixed_player(cards, flop, turn, river, next_history, fixed_player, opponent_model, p0, p1 * strategy[a])
+            
+            node_util += strategy[a] * util[a]
+        
+        # Update regrets only if this is the fixed player's decision point
+        if current_player == fixed_player:
+            for a in range(self.num_actions):
+                regret = util[a] - node_util
+                
+                # Multiply by the opponent's probability
+                if fixed_player == 0:
+                    node.regret_sum[a] += p1 * regret
+                else:
+                    node.regret_sum[a] += p0 * regret
+        
+        return node_util
+    
+class RuleBasedModel:
+    """Rule-based poker model for baseline evaluation."""
+    def __init__(self, action_map, strategy):
+        self.action_map = action_map
+        self.node_map = {}
+        self.strategy = strategy  # fixed strategy [p_prob, b_prob, f_prob]
+
+
+class RuleBasedNode(HoldemNode):
+    """Node that always returns a fixed strategy."""
+    def __init__(self, info_set_key, strategy):
+        self.info_set_key = info_set_key
+        self.strategy = strategy
+    
+    def get_average_strategy(self):
+        """Return the fixed strategy."""
+        return self.strategy
+    
+    def get_strategy(self, realization_weight):
+        return self.strategy
 
 def load_node_map(filename, num_actions):
     df = pd.read_parquet(filename)
@@ -214,6 +321,12 @@ def train(iterations, num_clusters, filename):
         cfr.cfr(cards,flop,turn, river, info_set2, 1, 1.0, 1.0)  # For player 1
         if (i+1) % 10 == 0 or i == 0:
             print(f"Completed {i+1} iterations")
+        if i == 1000:
+            cfr.save_node_map("bucket_5_1k_2.parquet")
+        if i == 10000:
+            cfr.save_node_map("bucket_5_10k_2.parquet")
+        if i == 20000:
+            cfr.save_node_map("bucket_5_20k_2.parquet")
     print("Training completed.")
     cfr.save_node_map(filename)
 
@@ -249,6 +362,44 @@ def continue_training(iterations, num_clusters, filename):
     print("Training completed.")
     cfr.save_node_map(filename)
 
+def train_with_fixed_player(iterations, num_clusters, opponent, filename):
+    hc = evaluator.HandClustering()
+    print("Building lookup tables...")
+    hc.build_preflop_table(20000, num_clusters)
+    print("Building preflop table finished.")
+    hc.build_flop_table(20000, num_clusters)
+    print("Building flop table finished.")
+    hc.build_turn_table(20000, num_clusters)
+    print("Building turn table finished.")
+    hc.build_river_table(20000, num_clusters)
+    print("Building river table finished.")
+    cfr = HoldemCFR(3, hc, action_map = {0: 'p', 1: 'b', 2:'f'})
+    print("Training...")
+    for i in range(iterations):
+        # Deal random cards
+        deck = deuces.Deck()
+        player1_cards = deck.draw(2)
+        player2_cards = deck.draw(2)
+        cards = [player1_cards, player2_cards]
+        flop = deck.draw(3)
+        [turn, river] = deck.draw(2)
+        info_set1 = HoldemInfoSet()
+        info_set2 = HoldemInfoSet()
+        # # Run CFR for each player
+        cfr.cfr_with_fixed_player(cards, flop, turn, river, info_set1, 0, opponent, 1.0, 1.0)  # For player 0
+        cfr.cfr_with_fixed_player(cards, flop, turn, river, info_set2, 1, opponent, 1.0, 1.0)  # For player 1
+        if (i+1) % 10 == 0 or i == 0:
+            print(f"Completed {i+1} iterations")
+    print("Training completed.")
+    cfr.save_node_map(filename)
+
+always_call_model = RuleBasedModel(
+    action_map={0: 'p', 1: 'b', 2: 'f'},
+    strategy=[1.0, 0.0, 0.0]  
+)
+#train_with_fixed_player(10000, 5, always_call_model, "anti_calling station.parquet")    
+
 #train(30000, 5, "bucket_5_30k.parquet")
-#train(50000, 5, "bucket_5_50k.parquet")
+train(30000, 5, "bucket_5_30k_2.parquet")
+#train_with_fixed_player(50000, 5, always_call_model, "against_calling_machine_50k.parquet")
 # continue_training(10000, 6,  "with_antes_6.parquet")
