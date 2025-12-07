@@ -1,6 +1,7 @@
 from fastapi import FastAPI
-from dto import MoveDTO
+from dto import MoveDTO, HoldemInfoSetDTO
 from model import PokerMove
+from poker_service import PokerService
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -21,7 +22,6 @@ def hello():
     return {"message": "Hello from Poker API!"}
 
 @app.post("/")
-def post(nums: int):
-    return MoveDTO(
-        poker_move = PokerMove.PASS
-)
+def post(state: HoldemInfoSetDTO) -> MoveDTO:
+    service = PokerService()
+    return service.get_move(state)

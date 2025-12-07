@@ -1,4 +1,5 @@
 import { Oracle } from "./oracle";
+import { ClientOracle } from "./client-oracle";
 import { Player } from "./player";
 import { Stake } from "./stake";
 import { Map } from '../components/component-game-poker-squares/map';
@@ -10,10 +11,10 @@ export class ArtificialPlayer extends Player{
         this.map=map;
     }
     public override async Step(): Promise<void>{
-        let oracle = new Oracle(this.map.gameManager);        
+        let oracle = new ClientOracle(this.map.gameManager);        
         let suggestion= await oracle.SuggestMove(this.GetCards()[0], this.GetCards()[1], this.map.getCommunityCards());
         console.log("step "+suggestion);
-        await this.delay(5000);
+        //await this.delay(5000);
         
         switch (suggestion){
             case 1: {

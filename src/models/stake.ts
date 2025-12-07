@@ -3,8 +3,10 @@ import { Player } from "./player";
 
 export abstract class Stake{
     protected gameManager: GameManager;
-    protected players: Player[]=[];
+    public players: Player[]=[];
     protected pot: number=0;
+    public actions = ["", "", "", ""];
+    public round = 0;
     constructor(gameManager: GameManager){
         this.gameManager=gameManager;
     }
@@ -12,7 +14,7 @@ export abstract class Stake{
     public addPlayers(players: Player[]){
         this.players=players;
     }
-    public initializeRound(bigBets: boolean){}
+    public initializeRound(bigBets: boolean, round: number){}
     public collectStarterBets(){}
 
     public Bet(amount: number, player: Player): boolean{ return false;}

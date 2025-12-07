@@ -4,14 +4,11 @@ import { HandNames } from "./hand-names";
 
 
 export class Oracle{
-    private gameManager: GameManager
+    protected gameManager: GameManager
      constructor(gameManager: GameManager){
         this.gameManager=gameManager;
      }
     public async SuggestMove(card1: Card, card2: Card, communityCards: Card[]): Promise<number>{
-        // const response = await fetch("http://localhost:8000/hello");
-        // const data = await response.json();
-        // console.log(data);
         let len = communityCards.length;
         if(len == 0){
             return this.cautiousSuggestion();

@@ -114,31 +114,10 @@ def evaluate_models_by_sum(cfr0, cfr1, hc0, hc1, num_games=10000):
     results["player1_utility"] = - results["player0_utility"]  
     return results
 
-# hc5 = evaluator.HandClustering()
-# hc6 = evaluator.HandClustering()
-# print("Building lookup tables...")
-# hc5.build_preflop_table(20000, 5)
-# hc6.build_preflop_table(20000, 6)
-# print("Building preflop table finished.")
-# hc5.build_flop_table(20000, 5)
-# hc6.build_flop_table(20000, 6)
-# print("Building flop table finished.")
-# hc5.build_turn_table(20000, 5)
-# hc6.build_turn_table(20000, 6)
-# print("Building turn table finished.")
-# hc5.build_river_table(20000, 5)
-# hc6.build_river_table(20000, 6)
-# print("Building river table finished.")
 
 hc = evaluator.HandClustering()
 
-
-print("Building lookup tables...")
-hc.build_preflop_table(20000, 5)
-hc.build_flop_table(20000, 5)
-hc.build_turn_table(20000, 5)
-hc.build_river_table(20000, 5)
-print("Building lookup tables finished.")
+hc.load_tables()
 
 action_map = {0: 'p', 1: 'b', 2: 'f'}
 
@@ -147,7 +126,6 @@ always_call_model = RuleBasedModel(
     strategy=[1.0, 0.0, 0.0]  # 100% call/check, 0% bet/raise, 0% fold
 )
 
-# Always Raise model: bets/raises (action 1) with 100% probability
 always_raise_model = RuleBasedModel(
     action_map=action_map,
     strategy=[0.0, 1.0, 0.0]  # 0% call/check, 100% bet/raise, 0% fold
@@ -157,11 +135,11 @@ cfr1 = holdem.HoldemCFR(3, hc, action_map={0: 'p', 1: 'b', 2: 'f'}, node_map=hol
 cfr10 = holdem.HoldemCFR(3, hc, action_map={0: 'p', 1: 'b', 2: 'f'}, node_map=holdem.load_node_map("bucket_5_10k.parquet", 3))
 cfr20 = holdem.HoldemCFR(3, hc, action_map={0: 'p', 1: 'b', 2: 'f'}, node_map=holdem.load_node_map("bucket_5_20k.parquet", 3))
 cfr30 = holdem.HoldemCFR(3, hc, action_map={0: 'p', 1: 'b', 2: 'f'}, node_map=holdem.load_node_map("bucket_5_30k.parquet", 3))
-cfr50 = holdem.HoldemCFR(3, hc, action_map={0: 'p', 1: 'b', 2: 'f'}, node_map=holdem.load_node_map("bucket_5_50k_2.parquet", 3))
+cfr50 = holdem.HoldemCFR(3, hc, action_map={0: 'p', 1: 'b', 2: 'f'}, node_map=holdem.load_node_map("bucket_5_50k_3.parquet", 3))
 cfr_against_calling_station = holdem.HoldemCFR(3, hc, action_map, node_map=holdem.load_node_map("against_calling_machine_50k.parquet", 3))
 
 #cfr_list = [always_call_model, always_raise_model, cfr1, cfr10, cfr20, cfr30, cfr50]
-cfr_list = [always_call_model, cfr50]
+cfr_list = [always_call_model, cfr_against_calling_station]
 results = []
 for i in range(len(cfr_list)):
     for j in range (i+1, len(cfr_list)):

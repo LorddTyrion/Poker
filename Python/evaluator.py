@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import os
 import random
+import pickle
 # card = Card.new('Qh')
 # board = [
 #     Card.new('Ah'),
@@ -197,6 +198,7 @@ class HandClustering:
     def get_preflop_cluster(self, hand):
         [card1, card2] = hand
         key = canonical_hand_key(card1, card2)
+        print(key)
         if key in self.preflop_map:
             return self.preflop_map[key]
         
@@ -342,7 +344,13 @@ class HandClustering:
         Path(directory).mkdir(parents=True, exist_ok=True)
         
         if self.preflop_map:
-            df_preflop = pd.DataFrame(list(self.preflop_map.items()), columns=['hand_key', 'cluster'])
+            rows = []
+            for key, cluster in self.preflop_map.items():
+                rows.append({
+                    "hand_key": pickle.dumps(key),
+                    "cluster": cluster
+                })
+            df_preflop = pd.DataFrame(rows)
             df_preflop.to_parquet(os.path.join(directory, 'preflop_map.parquet'), index=False)
             print(f"Saved preflop map with {len(self.preflop_map)} entries")
 
@@ -364,9 +372,14 @@ class HandClustering:
 
         preflop_path = os.path.join(directory, 'preflop_map.parquet')
         if os.path.exists(preflop_path):
+            self.preflop_map = {}
             df_preflop = pd.read_parquet(preflop_path)
-            self.preflop_map = dict(zip(df_preflop['hand_key'], df_preflop['cluster']))
+            for _, row in df_preflop.iterrows():
+                key = pickle.loads(row["hand_key"])
+                cluster = row["cluster"]
+                self.preflop_map[key] = cluster
             print(f"Loaded preflop_map with {len(self.preflop_map)} entries")
+            print(self.preflop_map)
         else:
             print(f"Warning: {preflop_path} not found")
 
@@ -395,15 +408,17 @@ class HandClustering:
             print(f"Warning: {river_path} not found")
 
 
-hc = HandClustering()
-print("Building lookup tables...")
-hc.build_preflop_table(20000, 5)
-print("Building preflop table finished.")
-hc.build_flop_table(20000, 5)
-print("Building flop table finished.")
-hc.build_turn_table(20000, 5)
-print("Building turn table finished.")
-hc.build_river_table(20000, 5)
-print("Building river table finished.")
+# hc = HandClustering()
+# print("Building lookup tables...")
+# hc.build_preflop_table(20000, 5)
+# print("Building preflop table finished.")
+# hc.build_flop_table(20000, 5)
+# print("Building flop table finished.")
+# hc.build_turn_table(20000, 5)
+# print("Building turn table finished.")
+# hc.build_river_table(20000, 5)
+# print("Building river table finished.")
 
-hc.save_tables()
+# hc.save_tables()
+# hc.load_tables()
+# print(hc.preflop_map)

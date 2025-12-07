@@ -1,11 +1,11 @@
-from pydantic import Field
+from pydantic import Field, BaseModel
 from model import Move, PokerMove, Card, Suit
 from holdem import HoldemInfoSet
 from deuces import Card as DeucesCard, Evaluator
 from evaluator import HandClustering
 
-class MoveDTO:
-    poker_move: PokerMove
+class MoveDTO(BaseModel):
+    poker_move: PokerMove = Field(alias="pokerMove")
 
     def to_move(self):
         return Move(
@@ -18,10 +18,10 @@ class MoveDTO:
         )
     
 
-class HoldemInfoSetDTO:
+class HoldemInfoSetDTO(BaseModel):
     history: list[str] = Field(default=["", "", "", ""])
     own_cards: list[Card] = Field(alias="ownCards", default=[])
-    flop: list[Card] = Field(default=[])
+    flop: list[Card] | None = Field(default=[])
     turn: Card | None = Field(default=None)
     river: Card | None = Field(default=None)
     round: int = Field(default=0)
@@ -33,27 +33,29 @@ class HoldemInfoSetDTO:
         info_set.round=self.round
         info_set.pot=self.pot
         hand = [card_to_deuces_card(own_card) for own_card in self.own_cards]
-        flop = [card_to_deuces_card(flop_card) for flop_card in self.flop]
-        turn = card_to_deuces_card(self.turn)
-        river = card_to_deuces_card(self.river)
+        flop = [card_to_deuces_card(flop_card) for flop_card in self.flop] if self.flop else []
+        turn = card_to_deuces_card(self.turn) if self.turn else None
+        river = card_to_deuces_card(self.river) if self.river else None
         info_set.clear_clusters()
         evaluator = Evaluator()
         hand_clustering = HandClustering()
         hand_clustering.load_tables()
         info_set.add_cluster(hand_clustering.get_preflop_cluster(hand))
+        print(hand)
         board = []
         if self.round >=1:
             board +=flop
             evaluation = evaluator.evaluate(hand, flop)
             info_set.add_cluster(hand_clustering.get_flop_cluster(evaluation))
-        if round >=2:
+        if self.round >=2:
             board.append(turn)
             evaluation = evaluator.evaluate(hand, board)
             info_set.add_cluster(hand_clustering.get_turn_cluster(evaluation))
-        if round >=3:
+        if self.round >=3:
             board.append(river)
             evaluation = evaluator.evaluate(hand, board)
             info_set.add_cluster(hand_clustering.get_river_cluster(evaluation))
+        print(info_set)
         return info_set
 
 
@@ -74,4 +76,5 @@ def card_to_deuces_card(card: Card) -> int:
     rank_char = rank_map[card.rank]
     suit_char = suit_map[card.suit]
     card_str = rank_char + suit_char
+    print(card_str)
     return DeucesCard.new(card_str)

@@ -16,12 +16,13 @@ export class FixLimitStake extends Stake{
     constructor(gameManager: GameManager){
         super(gameManager);
     }
-    public override initializeRound(bigBets: boolean): void {
+    public override initializeRound(bigBets: boolean, round: number): void {
         this.bigBets=bigBets;
         this.highestBet=0;
         this.checkCount=0;
         this.raises=0;
         this.opened=false;
+        this.round=round;
         for(let i=0; i< this.players.length; i++){
             this.players[i].SetLive(false);
             this.players[i].SetCurrentBet(0);
@@ -72,6 +73,7 @@ export class FixLimitStake extends Stake{
         this.opened=true;
         this.gameManager.updateMoney([this.playersInOrder()[0].GetMoney(), this.playersInOrder()[1].GetMoney()], this.pot); 
         this.gameManager.updateAction(player.GetIndex(), "BET");
+        this.actions[this.round]+="b";
         console.log("Bet success")
         return true;
     }
@@ -85,7 +87,8 @@ export class FixLimitStake extends Stake{
         player.SetCurrentBet(this.highestBet);
         player.SetLive(false);
         this.gameManager.updateMoney([this.playersInOrder()[0].GetMoney(), this.playersInOrder()[1].GetMoney()], this.pot);
-        this.gameManager.updateAction(player.GetIndex(), "CALL");  
+        this.gameManager.updateAction(player.GetIndex(), "CALL");
+        this.actions[this.round]+="p";  
         console.log("Call success")
         return true;
     }
@@ -109,7 +112,8 @@ export class FixLimitStake extends Stake{
         player.SetCurrentBet(this.highestBet);
         this.raises++;
         this.gameManager.updateMoney([this.playersInOrder()[0].GetMoney(), this.playersInOrder()[1].GetMoney()], this.pot);
-        this.gameManager.updateAction(player.GetIndex(), "RAISE");  
+        this.gameManager.updateAction(player.GetIndex(), "RAISE");
+        this.actions[this.round]+="b";  
         console.log("Raise success")
         return true;
     }
@@ -117,6 +121,7 @@ export class FixLimitStake extends Stake{
         player.SetLive(false);
         player.SetActive(false);
         this.gameManager.updateAction(player.GetIndex(), "FOLD");
+        this.actions[this.round]+="f";
         console.log("Fold success")
         return true;
     }
@@ -126,6 +131,7 @@ export class FixLimitStake extends Stake{
         if(this.opened) return false;
         this.checkCount++;
         this.gameManager.updateAction(player.GetIndex(), "CHECK");
+        this.actions[this.round]+="p";
         console.log("Check success")
         return true;
     }

@@ -20,7 +20,7 @@ export class Slot extends PIXI.Container implements ISlot {
     col.addSlot(this);
     row.addSlot(this);
     let color = bgColor;
-    if (bgColor == null) color = 0x61a92e;
+    if (bgColor == null) color =0x2596be;//0x61a92e
     this.bgParams = { color, height: 140, width: 100, x: 0, y: 0 };
     const bg = new PIXI.Graphics();
     this.addChild(bg);

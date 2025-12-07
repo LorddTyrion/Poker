@@ -27,7 +27,7 @@ export class ShowSlot extends PIXI.Container implements ISlot {
     const bg = new PIXI.Graphics();
     this.addChild(bg);
 
-    bg.beginFill(0x61a92e);
+    bg.beginFill(0x2596be);
     bg.drawRoundedRect(this.bgParams.x, this.bgParams.y, this.bgParams.width, this.bgParams.height, 12);
     bg.endFill();
   }

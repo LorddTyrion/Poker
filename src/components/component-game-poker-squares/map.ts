@@ -39,7 +39,7 @@ export class Map extends PIXI.Container {
     super();
     Map.canMoveCard = true;
     this.bg = new PIXI.Graphics();
-    this.bg.beginFill(0xaade87);
+    this.bg.beginFill(0x16b0e8);
     this.bg.drawRect(0, -headerHeight, this.game.dim.w, this.game.dim.h + headerHeight);
     this.bg.endFill();
     this.bg.interactive = true;
@@ -71,7 +71,7 @@ export class Map extends PIXI.Container {
       this.rows.push(newRow);
     }
 
-    const offset = 300;
+    const offset = 200;
    
 
     //Player 1
@@ -101,7 +101,7 @@ export class Map extends PIXI.Container {
 
     this.showSlot = new ShowSlot(this);
     this.deckSlot = new Deck(this, this.showSlot);
-    this.deckSlot.position.set(this.deckSlot.getBounds().width * 0.1 + offset, (this.game.dim.h - this.deckSlot.getBounds().height) / 2);
+    this.deckSlot.position.set(offset + this.deckSlot.getBounds().width * 0.1, (this.game.dim.h - this.deckSlot.getBounds().height) / 2);
     this.addChild(this.deckSlot);
     this.showSlot.position.set(
       this.deckSlot.getBounds().right + this.showSlot.getBounds().width * 0.1,

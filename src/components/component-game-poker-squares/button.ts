@@ -9,7 +9,7 @@ export class Button extends PIXI.NineSlicePlane {
 
         fontSize: 35,
         label: 'Button',
-        stroke: '#336699',
+        stroke: '#2596be',
         strokeThickness: 4
     };
     private label: PIXI.Text;

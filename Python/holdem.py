@@ -4,6 +4,7 @@ import evaluator
 from typing import List
 import pandas as pd
 import pickle
+import time
 
     
 
@@ -131,7 +132,7 @@ class HoldemCFR(base.CFR):
                
         
         # Get current strategy
-        strategy = node.get_strategy(p0 if current_player == 1 else p1)
+        strategy = node.get_strategy(p0 if current_player == 0 else p1)
         
         # Initialize utility arrays
         util = [0.0, 0.0, 0.0]
@@ -140,7 +141,7 @@ class HoldemCFR(base.CFR):
         
         # Recursively calculate utility for each action
         for a in range(self.num_actions):
-            if history.get_history().count('b') >= 2: # only 2 bets/raises allowed
+            if a==1 and history.get_history().count('b') >= 2: # only 2 bets/raises allowed
                 continue
             next_history = HoldemInfoSet.from_key(info_set)
             amount_bet = 0
@@ -164,6 +165,8 @@ class HoldemCFR(base.CFR):
         # Update regrets only if this is the fixed player's decision point
         if current_player == fixed_player:
             for a in range(self.num_actions):
+                if a==1 and history.get_history().count('b') >= 2: # only 2 bets/raises allowed
+                    continue
                 regret = util[a] - node_util
                 
                 # Multiply by the opponent's probability
@@ -217,7 +220,7 @@ class HoldemCFR(base.CFR):
                
         
         # Get current strategy
-        strategy = node.get_strategy(p0 if current_player == 1 else p1)
+        strategy = node.get_strategy(p0 if current_player == 0 else p1)
         
         # Initialize utility arrays
         util = [0.0, 0.0, 0.0]
@@ -226,7 +229,7 @@ class HoldemCFR(base.CFR):
         
         # Recursively calculate utility for each action
         for a in range(self.num_actions):
-            if history.get_history().count('b') >= 2: # only 2 bets/raises allowed
+            if a==1 and history.get_history().count('b') >= 2: # only 2 bets/raises allowed
                 continue
             next_history = HoldemInfoSet.from_key(info_set)
             amount_bet = 0
@@ -250,6 +253,8 @@ class HoldemCFR(base.CFR):
         # Update regrets only if this is the fixed player's decision point
         if current_player == fixed_player:
             for a in range(self.num_actions):
+                if a==1 and history.get_history().count('b') >= 2: # only 2 bets/raises allowed
+                    continue
                 regret = util[a] - node_util
                 
                 # Multiply by the opponent's probability
@@ -304,6 +309,7 @@ def train(iterations, num_clusters, filename):
     print("Building turn table finished.")
     hc.build_river_table(20000, num_clusters)
     print("Building river table finished.")
+    start_time = time.time()
     cfr = HoldemCFR(3, hc, action_map = {0: 'p', 1: 'b', 2:'f'})
     print("Training...")
     for i in range(iterations):
@@ -322,12 +328,15 @@ def train(iterations, num_clusters, filename):
         if (i+1) % 10 == 0 or i == 0:
             print(f"Completed {i+1} iterations")
         if i == 1000:
-            cfr.save_node_map("bucket_5_1k_2.parquet")
+            cfr.save_node_map("bucket_5_1k_3.parquet")
         if i == 10000:
-            cfr.save_node_map("bucket_5_10k_2.parquet")
+            cfr.save_node_map("bucket_5_10k_3.parquet")
         if i == 20000:
-            cfr.save_node_map("bucket_5_20k_2.parquet")
-    print("Training completed.")
+            cfr.save_node_map("bucket_5_20k_3.parquet")
+        if i == 30000:
+            cfr.save_node_map("bucket_5_30k_3.parquet")
+    duration = time.time() - start_time
+    print(f"Training completed in {duration}")
     cfr.save_node_map(filename)
 
 def continue_training(iterations, num_clusters, filename):
@@ -400,6 +409,6 @@ always_call_model = RuleBasedModel(
 #train_with_fixed_player(10000, 5, always_call_model, "anti_calling station.parquet")    
 
 #train(30000, 5, "bucket_5_30k.parquet")
-train(30000, 5, "bucket_5_30k_2.parquet")
+#train(50000, 5, "bucket_5_50k_3.parquet")
 #train_with_fixed_player(50000, 5, always_call_model, "against_calling_machine_50k.parquet")
 # continue_training(10000, 6,  "with_antes_6.parquet")

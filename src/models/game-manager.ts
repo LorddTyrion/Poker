@@ -13,7 +13,7 @@ export class GameManager{
   private playerCount: number=2;
   private playersOriginal: Player[]=[];
   private playersActual: Player[]=[];
-  private stake: Stake;
+  public stake: Stake;
   //private starter: Player;
 
   private failSafe: number=0;
@@ -72,17 +72,18 @@ export class GameManager{
     //this.rotatePlayers();
     //flop
     await this.map.deckSlot.dealCards();
-    this.stake.initializeRound(false);
+    this.stake.initializeRound(false, 1);
     await this.bettingRound();
+    console.log(this.stake.actions)
     //this.rotatePlayers();
     //turn
     await this.map.deckSlot.dealCards();
-    this.stake.initializeRound(true);
+    this.stake.initializeRound(true, 2);
     await this.bettingRound();
     //this.rotatePlayers();
     //river
     await this.map.deckSlot.dealCards();
-    this.stake.initializeRound(true);
+    this.stake.initializeRound(true, 3);
     await this.bettingRound();
     this.calculateWinner();
   }
