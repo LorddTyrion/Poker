@@ -19,6 +19,7 @@ class MoveDTO(BaseModel):
     
 
 class HoldemInfoSetDTO(BaseModel):
+    model: int = Field(default=2)
     history: list[str] = Field(default=["", "", "", ""])
     own_cards: list[Card] = Field(alias="ownCards", default=[])
     flop: list[Card] | None = Field(default=[])

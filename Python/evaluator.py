@@ -5,20 +5,6 @@ import pandas as pd
 import os
 import random
 import pickle
-# card = Card.new('Qh')
-# board = [
-#     Card.new('Ah'),
-#     Card.new('Kd'),
-#     Card.new('Jc')
-# ]
-# hand = [
-#    Card.new('Qs'),
-#    Card.new('Th')
-# ]
-# Card.print_pretty_cards(board + hand)
-
-# evaluator = Evaluator()
-# print(evaluator.evaluate(board, hand))
 
 def generate_169_hands():
     ranks = 'AKQJT98765432'
@@ -49,6 +35,7 @@ def hand_to_cards(hand_class):
         return random_suited_cards(r1, r2)
     else:
         return random_offsuit_cards(r1, r2)
+    
 def hand_to_cards_from_deck(hand_class, deck):
     r1, r2, suited = hand_class
     suits = 'cdhs'
@@ -121,7 +108,6 @@ def estimate_all_equities(num_simulations=1000):
     for i, hand in enumerate(hands):
         eq = estimate_equity(evaluator, hand, num_simulations)
         equity_map[hand] = eq
-        # print(f"{i+1}/{len(hands)}: {hand} -> {eq:.3f}")
 
     return equity_map
 
@@ -198,7 +184,6 @@ class HandClustering:
     def get_preflop_cluster(self, hand):
         [card1, card2] = hand
         key = canonical_hand_key(card1, card2)
-        print(key)
         if key in self.preflop_map:
             return self.preflop_map[key]
         
@@ -215,18 +200,6 @@ class HandClustering:
             return self.river_map[eval]
     
     def build_preflop_table(self, num_simulations, num_clusters):
-        # full_deck1 = Deck().GetFullDeck()
-        # full_deck2 = Deck().GetFullDeck()
-        # pairs = [(card1, card2) for card1 in full_deck1 for card2 in full_deck2 if card1 != card2]
-        # results = []
-        # for pair in pairs:
-        #     remaining_cards = [card for card in full_deck1 if card not in pair]
-        #     board = np.random.choice(remaining_cards, 5, replace=False)
-        #     he = HandEvaluator(list(pair), board)
-        #     results.append(he.simulate_preflop_games(num_simulations))
-        # clusters = self.get_clusters(10, results)
-        # for i, pair in enumerate(pairs):
-        #     self.preflop_map[pair] = clusters[i]
         equity_map = estimate_all_equities(num_simulations)
         sorted_items = sorted(equity_map.items(), key=lambda x: x[1])
         cluster_size = len(sorted_items) // num_clusters
@@ -238,20 +211,9 @@ class HandClustering:
             for i in range(start, end):
                 clusters[sorted_items[i][0]] = cluster_id
         self.preflop_map = clusters
-        print(self.preflop_map)
 
         
     def build_flop_table(self, num_simulations, num_clusters):
-        # deck = Deck()
-        # hand = deck.draw(2)
-        # board = deck.draw(3)
-        # results = []
-        # he = HandEvaluator(hand, board)
-        # for i in range(1, 7463):
-        #     results.append(he.simulate_games_by_eval(i, num_simulations, 3))
-        # clusters = self.get_clusters(10, results)
-        # for i in range (len(clusters)):
-        #     self.flop_map[i+1] = clusters[i]
         evals = []
         for _ in range(num_simulations):
             deck = Deck()
@@ -277,16 +239,6 @@ class HandClustering:
         
 
     def build_turn_table(self, num_simulations, num_clusters):
-        # deck = Deck()
-        # hand = deck.draw(2)
-        # board = deck.draw(4)
-        # results = []
-        # he = HandEvaluator(hand, board)
-        # for i in range(1, 7463):
-        #     results.append(he.simulate_games_by_eval(i, num_simulations, 4))
-        # clusters = self.get_clusters(10, results)
-        # for i in range (len(clusters)):
-        #     self.turn_map[i+1] = clusters[i]
         evals = []
         for _ in range(num_simulations):
             deck = Deck()
@@ -309,16 +261,6 @@ class HandClustering:
                 self.turn_map[i] = num_clusters - 1
 
     def build_river_table(self, num_simulations, num_clusters):
-        # deck = Deck()
-        # hand = deck.draw(2)
-        # board = deck.draw(5)
-        # results = []
-        # he = HandEvaluator(hand, board)
-        # for i in range(1, 7463):
-        #     results.append(he.simulate_games_by_eval(i, num_simulations, 5))
-        # clusters = self.get_clusters(10, results)
-        # for i in range (len(clusters)):
-        #     self.river_map[i+1] = clusters[i]
         evals = []
         for _ in range(num_simulations):
             deck = Deck()
@@ -379,7 +321,6 @@ class HandClustering:
                 cluster = row["cluster"]
                 self.preflop_map[key] = cluster
             print(f"Loaded preflop_map with {len(self.preflop_map)} entries")
-            print(self.preflop_map)
         else:
             print(f"Warning: {preflop_path} not found")
 

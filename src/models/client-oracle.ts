@@ -14,6 +14,7 @@ export class ClientOracle extends Oracle{
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({ 
+                        model: this.gameManager.playStyle,
                         history: this.gameManager.stake.actions,
                         ownCards: [
                             {

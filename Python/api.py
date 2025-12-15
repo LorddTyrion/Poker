@@ -17,9 +17,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/hello")
-def hello():
-    return {"message": "Hello from Poker API!"}
 
 @app.post("/")
 def post(state: HoldemInfoSetDTO) -> MoveDTO:

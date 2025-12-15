@@ -14,12 +14,14 @@ export class GameManager{
   private playersOriginal: Player[]=[];
   private playersActual: Player[]=[];
   public stake: Stake;
+  public playStyle: number;
   //private starter: Player;
 
   private failSafe: number=0;
 
-  constructor(map: Map){
+  constructor(map: Map, playStyle: number){
     this.map=map;
+    this.playStyle = playStyle;
     this.stake = new FixLimitStake(this);
     for(let i = 0; i<this.playerCount; i++){
       if(i==0){

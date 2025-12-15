@@ -9,7 +9,15 @@ class PokerService:
     def get_move(self, state: HoldemInfoSetDTO):
         info_set = state.to_holdem_info_set()
         key = info_set.key()
-        node_map = load_node_map("bucket_5_50k_3.parquet", 3)
+        match state.model:
+            case 1:
+                node_map=load_node_map("against_calling_machine_50k.parquet", 3)
+            case 2:
+                node_map = load_node_map("bucket_5_50k_3.parquet", 3)
+            case 3: 
+                node_map = load_node_map("anti_maniac_30k.parquet", 3)
+            case _:
+                node_map = load_node_map("bucket_5_50k_3.parquet", 3)
         if key not in node_map.keys():
             node = HoldemNode(key, 3)
         else:

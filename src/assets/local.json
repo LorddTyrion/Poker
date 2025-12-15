@@ -1,11 +1,14 @@
 {
     "hu": {
-        "start_round": "Ez egy kötött tétekkel játszott Texas Hold'em pókermeccs egy mesterséges játékos ellen. Kattints a paklira a kezdéshez!",
+        "start_round": "Ez egy kötött tétekkel játszott Texas Hold'em pókermeccs egy MI játékos ellen. Kattinst a játéksítlusodnak megfelelő gombra! Az asztal betöltése után kattints a paklira a kezdéshez!",
         "grat_for_all_success_round": "Játék vége!\n\nÖn $0!",
         "grat_for_success_round": "Gratulálunk!\n\nSikeresen megoldotta \n a(z) $0. fordulót!",
         "round": "Forduló: $0/$1",
         "timeout": "Sajnos lejárt az idő. De ne adja fel, próbálkozzon újra!",
         "skip": "Narráció mellőzése",
+        "passive": "Passzív",
+        "balanced": "Kiegyensúlyozott",
+        "aggressive": "Agresszív",
         "flush": "Szín",
         "poker": "Póker",
         "straight": "Sor",
@@ -19,12 +22,15 @@
         "lose": "vesztett"
     },
     "en": {
-        "start_round": "This is a fix limit texas hold'em poker game against an atrificial opponent. Click the deck of cards to start!",
+        "start_round": "This is a fix limit texas hold'em poker game against an AI opponent. Click the button corresponding to your play style. After the table has loaded, click the deck of cards to start!",
         "grat_for_all_success_round": "Game over!\n\nYou $0!",
         "grat_for_success_round": "Congratulation!\n\nIt was successfully solved \n by round $0!",
         "round": "Round: $0/$1",
         "timeout": "Unfortunately, time is up. But don't give up, try again!",
         "skip": "Ignore narration",
+        "passive": "Passive",
+        "balanced": "Balanced",
+        "aggressive": "Aggressive",
         "flush": "Flush",
         "poker": "Four of\n a kind",
         "straight": "Straight",

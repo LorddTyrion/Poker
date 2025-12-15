@@ -35,7 +35,7 @@ export class Map extends PIXI.Container {
   private static canMoveCard: boolean = true;
   public gameManager: GameManager;
 
-  constructor(settings: MapSettings, headerHeight: number, private game: IGame, private onEnded: () => void) {
+  constructor(settings: MapSettings, headerHeight: number, private game: IGame, playStyle: number, private onEnded: () => void) {
     super();
     Map.canMoveCard = true;
     this.bg = new PIXI.Graphics();
@@ -45,10 +45,11 @@ export class Map extends PIXI.Container {
     this.bg.interactive = true;
     this.addChild(this.bg);
     this.sortableChildren = true;
-    this.gameManager=new GameManager(this);
+    this.gameManager=new GameManager(this, playStyle);
 
+    const offset = 200;
     //this.onEnded.apply(() => console.log("END"));
-    
+
     this.raiseButton = new Button({ label: "Bet / Raise" }, this.game.loader);
     this.raiseButton.position.set((this.game.dim.w - this.raiseButton.getBounds().width) -100 ,(this.game.dim.h - this.raiseButton.getBounds().height)  - 100);
     this.addChild(this.raiseButton);
@@ -61,8 +62,6 @@ export class Map extends PIXI.Container {
     this.foldButton.position.set((this.game.dim.w - this.foldButton.getBounds().width) -100 ,(this.game.dim.h - 3.3* this.foldButton.getBounds().height)  - 100);
     this.addChild(this.foldButton);
     
-   
-    
 
 
     History.Init();
@@ -71,8 +70,7 @@ export class Map extends PIXI.Container {
       this.rows.push(newRow);
     }
 
-    const offset = 200;
-   
+    
 
     //Player 1
     const slot1 = new Slot(this, this.rows[0], this.rows[0], 1);

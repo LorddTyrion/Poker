@@ -72,7 +72,7 @@ export class Controller {
   }
 
   private initRound() {
-    this.infoMgr.showMsg(parseParamTranslate('start_round', this.game.custom_lang, this.gamePanel.currRound + 1)).then(() => {
+    this.infoMgr.showStartMsg(parseParamTranslate('start_round', this.game.custom_lang, this.gamePanel.currRound + 1)).then((playStyle) => {
       this.lastTs = this.gamePanel.recentTime;
       let game = { ...this.game };
       game.dim = {
@@ -80,7 +80,7 @@ export class Controller {
         h: game.dim.h - this.gamePanel.height,
       };
       game.custom_lang = this.game.custom_lang;
-      this.map = new Map(this.getSettings(this.difficulty), this.gamePanel.height, game, this.handleRoundEnd.bind(this));
+      this.map = new Map(this.getSettings(this.difficulty), this.gamePanel.height, game, playStyle, this.handleRoundEnd.bind(this));
       this.map.interactiveChildren = true;
       this.map.interactive = true;
       this.map.position.set(0, this.gamePanel.height);

@@ -11,7 +11,11 @@ export class InfoManager extends PIXI.Container {
   private bg: PIXI.Graphics;
   private showAnim: Process;
   private skip: PIXI.Sprite;
+  private passive: PIXI.Sprite;
+  private balanced: PIXI.Sprite;
+  private aggressive: PIXI.Sprite;
   private timer: Timer;
+  private playStyle: number = 2;
 
   constructor(private game: IGame, private gamePanel: GamePanel, private container: any) {
     super();
@@ -61,6 +65,73 @@ export class InfoManager extends PIXI.Container {
     this.addChild(this.skip);
     this.skip.position.set((this.game.dim.w - skipbg.width + 4 * padding) / 2, this.game.dim.h - skipbg.height - 2 * padding);
 
+    this.passive = new PIXI.Sprite();
+    this.passive.anchor.set(0.5, 1);
+    const passiveShadow = new PIXI.Graphics();
+    const passivebg = new PIXI.Graphics();
+    const passiveText = new PIXI.Text(translate('passive', this.game.custom_lang), {
+      fontFamily: styleSheet.fontFamily,
+      fontSize: 20,
+      fill: '#ffffff',
+    });
+    this.passive.buttonMode = true;
+    passivebg.beginFill(0x2b7371, 1);
+    passiveShadow.beginFill(0x0, 1);
+    passiveShadow.drawRoundedRect(-padding * 2 + 1, -padding + 1, passiveText.width + padding * 4 - 2, passiveText.height + padding * 2 - 2, (passiveText.height + padding * 2) / 2);
+    this.passive.addChild(passiveShadow);
+    addShadow(passiveShadow);
+    passivebg.drawRoundedRect(-padding * 2, -padding, passiveText.width + padding * 4, passiveText.height + padding * 2, (passiveText.height + padding * 2) / 2);
+    passivebg.endFill();
+    passivebg.addChild(passiveText);
+    this.passive.addChild(passivebg);
+    this.addChild(this.passive);
+    this.passive.position.set((this.game.dim.w - passivebg.width + 4 * padding) / 4, this.game.dim.h - passivebg.height - 2 * padding);
+
+    this.balanced = new PIXI.Sprite();
+    this.balanced.anchor.set(0.5, 1);
+    const balancedShadow = new PIXI.Graphics();
+    const balancedbg = new PIXI.Graphics();
+    const balancedText = new PIXI.Text(translate('balanced', this.game.custom_lang), {
+      fontFamily: styleSheet.fontFamily,
+      fontSize: 20,
+      fill: '#ffffff',
+    });
+    this.balanced.buttonMode = true;
+    balancedbg.beginFill(0x2b7371, 1);
+    balancedShadow.beginFill(0x0, 1);
+    balancedShadow.drawRoundedRect(-padding * 2 + 1, -padding + 1, balancedText.width + padding * 4 - 2, balancedText.height + padding * 2 - 2, (balancedText.height + padding * 2) / 2);
+    this.balanced.addChild(balancedShadow);
+    addShadow(balancedShadow);
+    balancedbg.drawRoundedRect(-padding * 2, -padding, balancedText.width + padding * 4, balancedText.height + padding * 2, (balancedText.height + padding * 2) / 2);
+    balancedbg.endFill();
+    balancedbg.addChild(balancedText);
+    this.balanced.addChild(balancedbg);
+    this.addChild(this.balanced);
+    this.balanced.position.set((this.game.dim.w - balancedbg.width + 4 * padding) / 2, this.game.dim.h - balancedbg.height - 2 * padding);
+
+    this.aggressive = new PIXI.Sprite();
+    this.aggressive.anchor.set(0.5, 1);
+    const aggressiveShadow = new PIXI.Graphics();
+    const aggressivebg = new PIXI.Graphics();
+    const aggressiveText = new PIXI.Text(translate('aggressive', this.game.custom_lang), {
+      fontFamily: styleSheet.fontFamily,
+      fontSize: 20,
+      fill: '#ffffff',
+    });
+    this.aggressive.buttonMode = true;
+    aggressivebg.beginFill(0x2b7371, 1);
+    aggressiveShadow.beginFill(0x0, 1);
+    aggressiveShadow.drawRoundedRect(-padding * 2 + 1, -padding + 1, aggressiveText.width + padding * 4 - 2, aggressiveText.height + padding * 2 - 2, (aggressiveText.height + padding * 2) / 2);
+    this.aggressive.addChild(aggressiveShadow);
+    addShadow(aggressiveShadow);
+    aggressivebg.drawRoundedRect(-padding * 2, -padding, aggressiveText.width + padding * 4, aggressiveText.height + padding * 2, (aggressiveText.height + padding * 2) / 2);
+    aggressivebg.endFill();
+    aggressivebg.addChild(aggressiveText);
+    this.aggressive.addChild(aggressivebg);
+    this.addChild(this.aggressive);
+    this.aggressive.position.set((this.game.dim.w - aggressivebg.width + 4 * padding) *(3/4), this.game.dim.h - aggressivebg.height - 2 * padding);
+
+
     this.bg.interactive = false;
     this.bg.on('pointerdown', () => {
       this.showAnim.forceFinish();
@@ -89,6 +160,79 @@ export class InfoManager extends PIXI.Container {
       },
       this,
     );
+
+    this.passive.interactive = false;
+    this.passive.visible = false;
+    this.passive.on(
+      'pointerdown',
+      () => {
+        passivebg.beginFill(0xbfc1c7, 1);
+        passivebg.drawRoundedRect(-padding * 2, -padding, passiveText.width + padding * 4, passiveText.height + padding * 2, (passiveText.height + padding * 2) / 2);
+        this.playStyle = 1;
+        this.game.changeNarration(false);
+        this.timer.stop();
+        this.showAnim.forceFinish();
+      },
+      this,
+    );
+
+    this.passive.on(
+      'pointerup',
+      () => {
+        passivebg.beginFill(0x2b7371, 1);
+        passivebg.drawRoundedRect(-padding * 2, -padding, passiveText.width + padding * 4, passiveText.height + padding * 2, (passiveText.height + padding * 2) / 2);
+      },
+      this,
+    );
+
+
+    this.balanced.interactive = false;
+    this.balanced.visible = false;
+    this.balanced.on(
+      'pointerdown',
+      () => {
+        balancedbg.beginFill(0xbfc1c7, 1);
+        balancedbg.drawRoundedRect(-padding * 2, -padding, balancedText.width + padding * 4, balancedText.height + padding * 2, (balancedText.height + padding * 2) / 2);
+        this.playStyle = 2;
+        this.game.changeNarration(false);
+        this.timer.stop();
+        this.showAnim.forceFinish();
+      },
+      this,
+    );
+
+    this.balanced.on(
+      'pointerup',
+      () => {
+        balancedbg.beginFill(0x2b7371, 1);
+        balancedbg.drawRoundedRect(-padding * 2, -padding, balancedText.width + padding * 4, balancedText.height + padding * 2, (balancedText.height + padding * 2) / 2);
+      },
+      this,
+    );
+
+    this.aggressive.interactive = false;
+    this.aggressive.visible = false;
+    this.aggressive.on(
+      'pointerdown',
+      () => {
+        aggressivebg.beginFill(0xbfc1c7, 1);
+        aggressivebg.drawRoundedRect(-padding * 2, -padding, aggressiveText.width + padding * 4, aggressiveText.height + padding * 2, (aggressiveText.height + padding * 2) / 2);
+        this.playStyle = 3;
+        this.game.changeNarration(false);
+        this.timer.stop();
+        this.showAnim.forceFinish();
+      },
+      this,
+    );
+
+    this.aggressive.on(
+      'pointerup',
+      () => {
+        aggressivebg.beginFill(0x2b7371, 1);
+        aggressivebg.drawRoundedRect(-padding * 2, -padding, aggressiveText.width + padding * 4, aggressiveText.height + padding * 2, (aggressiveText.height + padding * 2) / 2);
+      },
+      this,
+    );
   }
 
   public async showMsg(msg: string, disabledText: boolean = true): Promise<void> {
@@ -101,6 +245,12 @@ export class InfoManager extends PIXI.Container {
     this.bg.interactive = true;
     this.skip.visible = disabledText;
     this.skip.interactive = disabledText;
+    this.passive.visible = false;
+    this.passive.interactive = false;
+    this.balanced.visible = false;
+    this.balanced.interactive = false;
+    this.aggressive.visible = false;
+    this.aggressive.interactive = false;
     this.gamePanel.pauseTimer();
     this.msg.text = msg;
 
@@ -114,6 +264,42 @@ export class InfoManager extends PIXI.Container {
       this.gamePanel.resumeTimer();
       this.container.interactiveChildren = true;
       this.bg.interactive = false;
+    });
+  }
+
+  public async showStartMsg(msg: string, disabledText: boolean = true): Promise<number> {
+    console.log("Show message");
+    if (!this.game.doNarration && disabledText) {
+      console.log("Something's wrong, I can feel it");
+      return Promise.resolve(2);
+    }
+    this.container.interactiveChildren = false;
+    this.bg.interactive = true;
+    this.skip.visible = false;
+    this.skip.interactive = false;
+    this.passive.visible = disabledText;
+    this.passive.interactive = disabledText;
+    this.balanced.visible = disabledText;
+    this.balanced.interactive = disabledText;
+    this.aggressive.visible = disabledText;
+    this.aggressive.interactive = disabledText;
+    this.gamePanel.pauseTimer();
+    this.msg.text = msg;
+
+    const timeValue = msg.length * 60 + 3000;
+    this.setShowAnimTime(timeValue);
+    this.timer.scale.set(1);
+    this.timer.start(Math.round(timeValue / 1000));
+    this.timer.scale.set(50 / this.timer.getBounds().width);
+    return scheduler.run(this.showAnim, this).then(() => {
+      this.passive.interactive = false;
+      this.balanced.interactive = false;
+      this.aggressive.interactive = false;
+      this.gamePanel.resumeTimer();
+      this.container.interactiveChildren = true;
+      this.bg.interactive = false;
+
+      return this.playStyle;
     });
   }
 

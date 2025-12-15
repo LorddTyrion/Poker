@@ -270,7 +270,7 @@ class RuleBasedModel:
     def __init__(self, action_map, strategy):
         self.action_map = action_map
         self.node_map = {}
-        self.strategy = strategy  # fixed strategy [p_prob, b_prob, f_prob]
+        self.strategy = strategy
 
 
 class RuleBasedNode(HoldemNode):
@@ -399,6 +399,10 @@ def train_with_fixed_player(iterations, num_clusters, opponent, filename):
         cfr.cfr_with_fixed_player(cards, flop, turn, river, info_set2, 1, opponent, 1.0, 1.0)  # For player 1
         if (i+1) % 10 == 0 or i == 0:
             print(f"Completed {i+1} iterations")
+        if (i+1) == 10000:
+            cfr.save_node_map("anti_maniac_10k.parquet")
+        if (i+1) == 20000:
+            cfr.save_node_map("anti_maniac_20k.parquet")
     print("Training completed.")
     cfr.save_node_map(filename)
 
@@ -406,7 +410,12 @@ always_call_model = RuleBasedModel(
     action_map={0: 'p', 1: 'b', 2: 'f'},
     strategy=[1.0, 0.0, 0.0]  
 )
-#train_with_fixed_player(10000, 5, always_call_model, "anti_calling station.parquet")    
+
+always_raise_model = RuleBasedModel(
+    action_map={0: 'p', 1: 'b', 2: 'f'},
+    strategy=[0.0, 1.0, 0.0]
+)
+#train_with_fixed_player(30000, 5, always_raise_model, "anti_maniac_30k.parquet")    
 
 #train(30000, 5, "bucket_5_30k.parquet")
 #train(50000, 5, "bucket_5_50k_3.parquet")

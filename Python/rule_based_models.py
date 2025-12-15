@@ -5,7 +5,7 @@ class RuleBasedModel:
     def __init__(self, action_map, strategy):
         self.action_map = action_map
         self.node_map = {}
-        self.strategy = strategy  # fixed strategy [p_prob, b_prob, f_prob]
+        self.strategy = strategy
 
 
 class RuleBasedNode(HoldemNode):

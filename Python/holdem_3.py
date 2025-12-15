@@ -4,6 +4,7 @@ import evaluator
 from typing import List
 import pandas as pd
 import pickle
+import time
 
 class HoldemInfoSet(base.InfoSet):
     def __init__(self, num_players=2):
@@ -307,6 +308,18 @@ class HoldemCFR(base.CFR):
         return node_util
 
 
+def load_node_map(filename, num_actions):
+    df = pd.read_parquet(filename)
+    node_map = {}
+    for _, row in df.iterrows():
+        key = pickle.loads(row["key"])
+        info_set = HoldemInfoSet.from_key(key)
+        node = HoldemNode(info_set, num_actions)
+        node.regret_sum = list(row["regret_sum"])
+        node.strategy_sum = list(row["strategy_sum"])
+        node_map[key] = node
+    return node_map
+
 def train(iterations, num_clusters, num_players, filename):
     hc = evaluator.HandClustering()
     print("Building lookup tables...")
@@ -318,7 +331,7 @@ def train(iterations, num_clusters, num_players, filename):
     print("Building turn table finished.")
     hc.build_river_table(20000, num_clusters)
     print("Building river table finished.")
-    
+    start_time = time.time()
     cfr = HoldemCFR(3, hc, num_players=num_players, 
                     action_map={0: 'p', 1: 'b', 2: 'f'})
     print(f"Training with {num_players} players...")
@@ -344,7 +357,9 @@ def train(iterations, num_clusters, num_players, filename):
         if(i == 5000):
             cfr.save_node_map("3_players_5k.parquet")
     
-    print("Training completed.")
+    duration = time.time() - start_time
+    print(f"Training completed in {duration}")
     cfr.save_node_map(filename)
 
-train(10000, 5, 3, "3_players_10k.parquet")
+train(500, 5, 3, "proba.parquet")
+#train(1000, 5, 3, "3_players_10k.parquet")

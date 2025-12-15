@@ -137,9 +137,10 @@ cfr20 = holdem.HoldemCFR(3, hc, action_map={0: 'p', 1: 'b', 2: 'f'}, node_map=ho
 cfr30 = holdem.HoldemCFR(3, hc, action_map={0: 'p', 1: 'b', 2: 'f'}, node_map=holdem.load_node_map("bucket_5_30k.parquet", 3))
 cfr50 = holdem.HoldemCFR(3, hc, action_map={0: 'p', 1: 'b', 2: 'f'}, node_map=holdem.load_node_map("bucket_5_50k_3.parquet", 3))
 cfr_against_calling_station = holdem.HoldemCFR(3, hc, action_map, node_map=holdem.load_node_map("against_calling_machine_50k.parquet", 3))
+cfr_against_maniac = holdem.HoldemCFR(3, hc, action_map, node_map=holdem.load_node_map("anti_maniac_30k.parquet",3))
 
 #cfr_list = [always_call_model, always_raise_model, cfr1, cfr10, cfr20, cfr30, cfr50]
-cfr_list = [always_call_model, cfr_against_calling_station]
+cfr_list = [always_raise_model, cfr_against_maniac]
 results = []
 for i in range(len(cfr_list)):
     for j in range (i+1, len(cfr_list)):
