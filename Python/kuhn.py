@@ -93,7 +93,5 @@ def train(iterations):
 
 
     
-
-# Run training
 print("Training the agent...")
 train(1000000) 

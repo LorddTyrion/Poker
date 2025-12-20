@@ -121,7 +121,7 @@ class HoldemCFR(base.CFR):
         if info_set not in self.node_map:
             self.node_map[info_set] = self.create_node(info_set)
         node : HoldemNode = self.node_map[info_set]
-        # Check if we're at a terminal state
+
         if node.is_terminal(history):
             return node.get_terminal_utility(history, cards, board, fixed_player)        
         
@@ -130,16 +130,12 @@ class HoldemCFR(base.CFR):
             return self.cfr(cards, flop, turn, river, history, fixed_player, p0, p1)
             
                
-        
-        # Get current strategy
         strategy = node.get_strategy(p0 if current_player == 0 else p1)
         
-        # Initialize utility arrays
         util = [0.0, 0.0, 0.0]
         node_util = 0.0
         
         
-        # Recursively calculate utility for each action
         for a in range(self.num_actions):
             if a==1 and history.get_history().count('b') >= 2: # only 2 bets/raises allowed
                 continue
@@ -154,7 +150,7 @@ class HoldemCFR(base.CFR):
 
             next_history.set_history(next_history.get_history()+(self.action_map[a]))           
             next_history.add_to_pot(current_player, amount_bet)
-            # Update probabilities based on current player
+
             if current_player == 0:
                 util[a] = self.cfr(cards, flop, turn, river, next_history, fixed_player, p0 * strategy[a], p1)
             else:
@@ -162,14 +158,12 @@ class HoldemCFR(base.CFR):
             
             node_util += strategy[a] * util[a]
         
-        # Update regrets only if this is the fixed player's decision point
         if current_player == fixed_player:
             for a in range(self.num_actions):
-                if a==1 and history.get_history().count('b') >= 2: # only 2 bets/raises allowed
+                if a==1 and history.get_history().count('b') >= 2:
                     continue
                 regret = util[a] - node_util
                 
-                # Multiply by the opponent's probability
                 if fixed_player == 0:
                     node.regret_sum[a] += p1 * regret
                 else:
@@ -209,7 +203,6 @@ class HoldemCFR(base.CFR):
                 node = RuleBasedNode(info_set, opponent_model.strategy)
        
        
-        # Check if we're at a terminal state
         if node.is_terminal(history):
             return node.get_terminal_utility(history, cards, board, fixed_player)        
         
@@ -218,16 +211,11 @@ class HoldemCFR(base.CFR):
             return self.cfr_with_fixed_player(cards, flop, turn, river, history, fixed_player, opponent_model, p0, p1)
             
                
-        
-        # Get current strategy
         strategy = node.get_strategy(p0 if current_player == 0 else p1)
         
-        # Initialize utility arrays
         util = [0.0, 0.0, 0.0]
         node_util = 0.0
         
-        
-        # Recursively calculate utility for each action
         for a in range(self.num_actions):
             if a==1 and history.get_history().count('b') >= 2: # only 2 bets/raises allowed
                 continue
@@ -242,7 +230,7 @@ class HoldemCFR(base.CFR):
 
             next_history.set_history(next_history.get_history()+(self.action_map[a]))           
             next_history.add_to_pot(current_player, amount_bet)
-            # Update probabilities based on current player
+
             if current_player == 0:
                 util[a] = self.cfr_with_fixed_player(cards, flop, turn, river, next_history, fixed_player, opponent_model, p0 * strategy[a], p1)
             else:
@@ -250,14 +238,12 @@ class HoldemCFR(base.CFR):
             
             node_util += strategy[a] * util[a]
         
-        # Update regrets only if this is the fixed player's decision point
         if current_player == fixed_player:
             for a in range(self.num_actions):
-                if a==1 and history.get_history().count('b') >= 2: # only 2 bets/raises allowed
+                if a==1 and history.get_history().count('b') >= 2:
                     continue
                 regret = util[a] - node_util
                 
-                # Multiply by the opponent's probability
                 if fixed_player == 0:
                     node.regret_sum[a] += p1 * regret
                 else:
@@ -266,7 +252,6 @@ class HoldemCFR(base.CFR):
         return node_util
     
 class RuleBasedModel:
-    """Rule-based poker model for baseline evaluation."""
     def __init__(self, action_map, strategy):
         self.action_map = action_map
         self.node_map = {}
@@ -274,13 +259,11 @@ class RuleBasedModel:
 
 
 class RuleBasedNode(HoldemNode):
-    """Node that always returns a fixed strategy."""
     def __init__(self, info_set_key, strategy):
         self.info_set_key = info_set_key
         self.strategy = strategy
     
     def get_average_strategy(self):
-        """Return the fixed strategy."""
         return self.strategy
     
     def get_strategy(self, realization_weight):
@@ -322,7 +305,7 @@ def train(iterations, num_clusters, filename):
         [turn, river] = deck.draw(2)
         info_set1 = HoldemInfoSet()
         info_set2 = HoldemInfoSet()
-        # # Run CFR for each player
+        # Run CFR for each player
         cfr.cfr(cards, flop,turn, river, info_set1, 0, 1.0, 1.0)  # For player 0
         cfr.cfr(cards,flop,turn, river, info_set2, 1, 1.0, 1.0)  # For player 1
         if (i+1) % 10 == 0 or i == 0:

@@ -18,7 +18,6 @@ def play_hand(cfr_players: list, clustering):
     board = []
 
     while True:
-        # Update round state
         round = history.get_round()
         history.set_player_id(current_player)
         board = []
@@ -50,11 +49,9 @@ def play_hand(cfr_players: list, clustering):
         else:
             node = model.node_map[info_set_key]
 
-        # Terminal state?
         if node.is_terminal(history):
             return [node.get_terminal_utility(history, cards, board, i) for i in range(len(cfr_players))]
 
-        # Chance node (advance round)
         if node.is_chance_node(history):
             history.increment_round()
             continue
@@ -63,29 +60,25 @@ def play_hand(cfr_players: list, clustering):
         all_history = ''.join(history.history)
         player_actions = all_history[current_player::len(cfr_players)]
         if 'f' in player_actions:
-            # Player already folded, they auto-fold again
             history.set_history(history.get_history() + 'f')
             continue
 
         strategy = node.get_average_strategy()
-        strategy = [max(s, 0.0) for s in strategy]  # ensure no negatives
+        strategy = [max(s, 0.0) for s in strategy]
         total = sum(strategy)
         if total > 0:
             strategy = [s / total for s in strategy]
         else:
             strategy = [1.0 / 3] * 3
 
-        # Choose action
         action = random.choices(range(3), weights=strategy)[0]
 
-        # Only allow 2 raises/bets
         if history.get_history().count('b') >= 2 and action == 1:
-            action = 0  # force to 'p'
+            action = 0
 
         amount_bet = 0
         current_round_history = history.get_history()
 
-        # Calculate current bet level and this player's contribution so far this round
         current_bet_level = 0
         player_contribution = [0] * len(cfr_players)
         

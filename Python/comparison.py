@@ -10,7 +10,7 @@ def play_hand(cfr_player0, cfr_player1, hc5, hc6):
     flop = deck.draw(3)
     turn, river = deck.draw(2)
 
-    history = holdem.HoldemInfoSet()  # shared copy for simulation
+    history = holdem.HoldemInfoSet()
     evaluator = deuces.Evaluator()
 
     round = 0
@@ -18,7 +18,6 @@ def play_hand(cfr_player0, cfr_player1, hc5, hc6):
     board = []
 
     while True:
-        # Update round state
         round = history.get_round()
         board = []
         clustering = hc5 if current_player == 0 else hc6
@@ -50,31 +49,26 @@ def play_hand(cfr_player0, cfr_player1, hc5, hc6):
         else:
             node = model.node_map[info_set_key]
 
-        # Terminal state?
         if node.is_terminal(history):
             return node.get_terminal_utility(history, cards, board, 0)
 
-        # Chance node (advance round)
         if node.is_chance_node(history):
             history.increment_round()
             continue
 
         strategy = node.get_average_strategy()
-        strategy = [max(s, 0.0) for s in strategy]  # ensure no negatives
+        strategy = [max(s, 0.0) for s in strategy]
         total = sum(strategy)
         if total > 0:
             strategy = [s / total for s in strategy]
         else:
             strategy = [1.0 / 3] * 3
 
-        # Choose action
         action = random.choices(range(3), weights=strategy)[0]
 
-        # Only allow 2 raises/bets
         if history.get_history().count('b') >= 2 and action == 1:
-            action = 0  # force to 'p'
+            action = 0 
 
-        # Pot handling
         amount = 0
         if action==0 and (history.get_history() == "" or history.get_history() == "p"):
             amount= 0

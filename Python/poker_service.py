@@ -30,10 +30,8 @@ class PokerService:
         else:
             strategy = [1.0 / 3] * 3
 
-        # Choose action
         action = random.choices(range(3), weights=strategy)[0]
 
-        # Only allow 2 raises/bets
         if info_set.get_history().count('b') >= 2 and action == 1:
             action = 0
         
