@@ -4,30 +4,39 @@
 
 This is a Texas Hold'em Poker application where you can play against the computer. The betting follows a fixed limit betting form.
 
-To play, run the application (follow the instruction below), then click on the deck of cards. The poker match will start, and you can choose actions with the buttons on the right side.
+To play, run both the frontend and the backend application (follow the instructions below), then click on the deck of cards. The poker match will start, and you can choose actions with the buttons on the right side.
 
-# Stencil
+## Prerequisites
 
-Stencil is a compiler for building fast web apps using Web Components.
-
-Stencil combines the best concepts of the most popular frontend frameworks into a compile-time rather than runtime tool. Stencil takes TypeScript, JSX, a tiny virtual DOM layer, efficient one-way data binding, an asynchronous rendering pipeline (similar to React Fiber), and lazy-loading out of the box, and generates 100% standards-based Web Components that run in any browser supporting the Custom Elements v1 spec.
-
-Stencil components are just Web Components, so they work in any major framework or with no framework at all.
+You will need a Python environment (e. g. Anaconda) to run the backend application.
+You also need to install a number of packages (depending on the environment, some of them may already be included):
+```bash
+pip install fastapi uvicorn
+pip install deuces
+pip install numpy pandas
+```
 
 ## Getting Started
 
-To start the game, clone this repo to a new directory:
+Clone this repo to a new directory:
 
 ```bash
 git clone https://github.com/LorddTyrion/Poker.git
 cd Poker
 ```
 
-and run:
+To run the frontend application:
 
 ```bash
 npm install
 npm start
+```
+
+To run the backend application:
+
+```bash
+cd Python
+uvicorn api:app --reload
 ```
 
 
